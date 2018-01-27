@@ -216,6 +216,8 @@ public class ColorChange : MonoBehaviour
     List<List<GameObject>> GameObjectGridList = new List<List<GameObject>>();
     GameObject[] m_Civilians;
     int[] m_CivilianGridIndex;
+	int[] m_HumanSpeeds;
+	Vector3[] m_HumanHeadings;
 
     void BuildInitialListOfCivilians()
     {
@@ -223,10 +225,14 @@ public class ColorChange : MonoBehaviour
 
         int amountOfCivilians = m_Civilians.Length;
         m_CivilianGridIndex = new int[amountOfCivilians];
+		m_HumanSpeeds = new Vector3[amountOfCivilians];
+		m_HumanHeadings = new Vector3[amountOfCivilians];
 
         for (int i = 0; i < amountOfCivilians; ++i)
         {
             m_CivilianGridIndex[i] = 0;
+			m_HumanSpeeds [i] = 0;
+			m_HumanHeadings[i] = new Vector3(0.0f, 0.0f, 0.0f);
         }
 
     }
