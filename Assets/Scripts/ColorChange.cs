@@ -13,8 +13,8 @@ public class ColorChange : MonoBehaviour
     Color CurrentColor;
     Color NewColor;
     float Red, Blue, Green;
-    float InfectedSpeed = 3f;
-    float CivilianSPeed = 1.5f;
+    float InfectedSpeed = .5f;
+    float CivilianSPeed = .1f;
     public Transform Civilian;
     private MapReader g_MapReader;
 
@@ -75,6 +75,9 @@ public class ColorChange : MonoBehaviour
 
             switch (m_Civilians[i].tag)
             {
+                case "Dead":
+
+                    break;
                 case "Civilian":
 
                     break;
@@ -112,9 +115,9 @@ public class ColorChange : MonoBehaviour
         Red = ActiveSprite.color.r;
         Blue = ActiveSprite.color.b;
 
-        if (ActiveSprite.color.g <= .1f)
+        if (ActiveSprite.color.g <= 0.0f)
         {
-            ActiveSprite.tag = "Dead";
+            ActiveInfected.tag = "Dead";
         }
         else
         {
@@ -176,7 +179,7 @@ public class ColorChange : MonoBehaviour
     {
         Vector3 targetPosition = Target.transform.position;
 
-        if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= 1f)
+        if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= .1f)
         {
 
             Target.tag = "Infected";
