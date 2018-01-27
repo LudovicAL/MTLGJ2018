@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class ControlsManager : MonoBehaviour {
 	public float cameraSpeed = 10.0f;
-	public float updateGap = 0.1f;
+	public float updateGap = 0.02f;
+	private LineRenderer hollowLine;
 	private float nextUpdateTime;
 	private Transform cameraTransform;
 	private List<Vector2> coordList;
@@ -26,6 +27,7 @@ public class ControlsManager : MonoBehaviour {
 		movingScreen = false;
 		screenWidth = Screen.width;
 		screenHeight = Screen.height;
+		hollowLine = GameObject.Find("Line").GetComponent<LineRenderer>();
 		gameStatesManager = GameObject.Find ("Scriptsbucket").GetComponent<GameStatesManager>();
 		gameStatesManager.MenuGameState.AddListener(OnMenu);
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
@@ -93,11 +95,11 @@ public class ControlsManager : MonoBehaviour {
 				if (Input.GetMouseButton(0)) { //USER IS PRESSING THE MOUSE BUTTON
 					if (Input.GetMouseButtonDown(0)) { //USER PRESSED THE MOUSE BUTTON
 						wallBegan (Input.mousePosition);
-					} else if (Input.GetMouseButtonUp(0)) {	//USER RELEASED THE MOUSE BUTTON
-						wallEnded (Input.mousePosition);		
 					} else {	//USER JUST KEPT PRESSING THE MOUSE BUTTON
 						wallMoved (Input.mousePosition);
 					}
+				} else if (Input.GetMouseButtonUp(0)) {	//USER RELEASED THE MOUSE BUTTON
+					wallEnded (Input.mousePosition);		
 				}
 				if (Input.GetButton("Horizontal")) {	//USER IS PRESSING A HORIZONTAL ARROW KEY
 					moveCameraHorizontally(Mathf.Sign(Input.GetAxisRaw("Horizontal")));
@@ -144,13 +146,20 @@ public class ControlsManager : MonoBehaviour {
 		buildingWall = true;
 		coordList.Add(Camera.main.ScreenToWorldPoint(coord));
 		nextUpdateTime = Time.time + updateGap;
+		hollowLine.positionCount = 1;
+		hollowLine.SetPosition (0, Camera.main.ScreenToWorldPoint (coord));
+		hollowLine.enabled = true;
 	}
 
 	private void wallMoved(Vector2 coord) {
 		if (buildingWall) {
 			if (Time.time > nextUpdateTime) {
-				coordList.Add(Camera.main.ScreenToWorldPoint(coord));
+				Vector3 convertedCoord = Camera.main.ScreenToWorldPoint (coord);
+				convertedCoord.z = 0;
+				coordList.Add(convertedCoord);
 				nextUpdateTime = Time.time + updateGap;
+				hollowLine.positionCount = hollowLine.positionCount + 1;
+				hollowLine.SetPosition (hollowLine.positionCount - 1, convertedCoord);
 			}
 		}
 	}
@@ -162,6 +171,8 @@ public class ControlsManager : MonoBehaviour {
 			coordList.Clear ();
 			nextUpdateTime = 0.0f;
 			buildingWall = false;
+			hollowLine.enabled = false;
+			hollowLine.positionCount = 0;
 		}
 	}
 
@@ -169,6 +180,8 @@ public class ControlsManager : MonoBehaviour {
 		coordList.Clear ();
 		nextUpdateTime = 0.0f;
 		buildingWall = false;
+		hollowLine.enabled = false;
+		hollowLine.positionCount = 0;
 	}
 	
 	private void DrawWall() {
