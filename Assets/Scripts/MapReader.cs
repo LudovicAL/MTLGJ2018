@@ -5,10 +5,11 @@ using UnityEngine;
 
 public class MapReader : MonoBehaviour {
 	bool[,] m_Bitmap;
+	List<int[]> m_WhiteSpots;
 	int m_Width;
 	int m_Height;
 
-	void Start() {
+	void Awake() {
 		string filePath = Application.dataPath + "/Arts/ProtoCity_01.png";
 		Texture2D tex = LoadPNG (filePath);
 
@@ -20,11 +21,19 @@ public class MapReader : MonoBehaviour {
 		m_Width = tex.width;
 		m_Height = tex.height;
 		m_Bitmap = new bool[m_Width,m_Height];
+		m_WhiteSpots = new List<int[]>();
 
 		for (int i = 0; i < m_Width; ++i) {
 			for (int j = 0; j < m_Height; ++j) {
 				Color color = tex.GetPixel (i, j);
-				m_Bitmap [i,j] = color == Color.white ? true : false;
+				bool isFreeSpot = color == Color.white;
+
+				m_Bitmap [i,j] = isFreeSpot ? true : false;
+
+				if (isFreeSpot) {
+					int[] spotCoord = { i, j };
+					m_WhiteSpots.Add (spotCoord); 
+				}
 			}
 		}
 	}
@@ -32,6 +41,12 @@ public class MapReader : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
+	}
+
+	public float[] FindRandomWhiteSpace()
+	{
+		int[] whiteSpot = m_WhiteSpots[Random.Range(0, m_WhiteSpots.Count)];
+		return ConvertPixelCoordToWorldCoord (whiteSpot [0], whiteSpot [1]);
 	}
 
 	public bool CanMoveThere(float _xPos, float _yPos)
@@ -48,6 +63,14 @@ public class MapReader : MonoBehaviour {
 			return false;
 
 		return m_Bitmap[pixelPosX, pixelPosY];
+	}
+
+	float[] ConvertPixelCoordToWorldCoord(int _pixelX, int _pixelY)
+	{
+		float[] result = new float[2];
+		result[0] = (_pixelX - (m_Width/2.0f))/100.0f;
+		result[1] = (_pixelY - (m_Height/2.0f))/100.0f;
+		return result;
 	}
 
 	public Texture2D LoadPNG(string _filePath)

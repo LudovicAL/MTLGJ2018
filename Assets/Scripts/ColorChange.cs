@@ -15,9 +15,13 @@ public class ColorChange : MonoBehaviour
     float CivilianSPeed = 1.5f;
     public Transform Civilian;
 
+	private MapReader g_MapReader;
+
     // Use this for initialization
     void Start()
     {
+		g_MapReader = GameObject.Find ("MapReader").GetComponent<MapReader> ();
+
         float yAxis = Civilian.position.y;
         float xAxis = Civilian.position.x;
 
@@ -25,15 +29,19 @@ public class ColorChange : MonoBehaviour
 
         for (int i = 0; i < 1000; i++)
         {
-            xAxis += 2;
-            if (xAxis >= 35)
-            {
-                xAxis = Civilian.position.x;
-                yAxis += 2;
-            }
+			if (g_MapReader != null) { // valid map spawn
+				float[] randomSpawnPos = g_MapReader.FindRandomWhiteSpace ();
+				xAxis = randomSpawnPos [0];
+				yAxis = randomSpawnPos [1];
+			} else { // test spawn
+				xAxis += 2;
+				if (xAxis >= 35) {
+					xAxis = Civilian.position.x;
+					yAxis += 2;
+				}
+			}
 
-
-            Transform newCivilian = Instantiate(Civilian, new Vector3(xAxis, yAxis, 0), Quaternion.identity);
+			Transform newCivilian = Instantiate(Civilian, new Vector3(xAxis, yAxis, 0), Quaternion.identity);
             newCivilian.tag = "Civilian";
             newCivilian.name = "Civilian" + i;
             GridPosition(newCivilian);
