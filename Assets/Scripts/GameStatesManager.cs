@@ -28,7 +28,7 @@ public class GameStatesManager : MonoBehaviour {
 		if (PlayingGameState == null) {
 			PlayingGameState = new UnityEvent();
 		}
-		ChangeGameState(StaticData.AvailableGameStates.Menu);
+		ChangeGameState(StaticData.AvailableGameStates.Playing);
 	}
 
 	//Call this function from anywhere to request a game state change
