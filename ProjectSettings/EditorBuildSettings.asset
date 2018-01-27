@@ -5,9 +5,6 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/LudoGym.unity
     guid: b9bed37ca80b5a547a1e390a10df2492
-  - enabled: 1
-    path: Assets/Scenes/DuduGym.unity
-    guid: ec68cfa6ca939ab499ebe2c8e348e926
