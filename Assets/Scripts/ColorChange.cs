@@ -6,15 +6,15 @@ using System;
 
 public class ColorChange : MonoBehaviour
 {
-    
+
 
 
     List<Vector2> GridList = new List<Vector2>();
     Color CurrentColor;
     Color NewColor;
     float Red, Blue, Green;
-    float InfectedSpeed = 3f;
-    float CivilianSPeed = 1.5f;
+    float InfectedSpeed = .5f;
+    float CivilianSPeed = .1f;
     public Transform Civilian;
     private MapReader g_MapReader;
 
@@ -64,9 +64,7 @@ public class ColorChange : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // DrawDebugGrid();
         UpdateCivilianGameObjectLists();
-        //Test_DrawCivilianGameObjectListDebugLinesStaggered();
 
         int amountOfCivilians = m_Civilians.Length;
         for (int i = 0; i < amountOfCivilians; ++i)
@@ -75,6 +73,9 @@ public class ColorChange : MonoBehaviour
 
             switch (m_Civilians[i].tag)
             {
+                case "Dead":
+
+                    break;
                 case "Civilian":
 
                     break;
@@ -112,9 +113,9 @@ public class ColorChange : MonoBehaviour
         Red = ActiveSprite.color.r;
         Blue = ActiveSprite.color.b;
 
-        if (ActiveSprite.color.g <= .1f)
+        if (ActiveSprite.color.g <= 0.0f)
         {
-            ActiveSprite.tag = "Dead";
+            ActiveInfected.tag = "Dead";
         }
         else
         {
@@ -176,9 +177,8 @@ public class ColorChange : MonoBehaviour
     {
         Vector3 targetPosition = Target.transform.position;
 
-        if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= 1f)
+        if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= .1f)
         {
-
             Target.tag = "Infected";
         }
         else
@@ -216,8 +216,6 @@ public class ColorChange : MonoBehaviour
     List<List<GameObject>> GameObjectGridList = new List<List<GameObject>>();
     GameObject[] m_Civilians;
     int[] m_CivilianGridIndex;
-	int[] m_HumanSpeeds;
-	Vector3[] m_HumanHeadings;
 
     void BuildInitialListOfCivilians()
     {
@@ -225,14 +223,10 @@ public class ColorChange : MonoBehaviour
 
         int amountOfCivilians = m_Civilians.Length;
         m_CivilianGridIndex = new int[amountOfCivilians];
-		m_HumanSpeeds = new Vector3[amountOfCivilians];
-		m_HumanHeadings = new Vector3[amountOfCivilians];
 
         for (int i = 0; i < amountOfCivilians; ++i)
         {
             m_CivilianGridIndex[i] = 0;
-			int[i] = new Vector3;
-			m_HumanSpeeds[i] = new Vector3[amountOfCivilians];
         }
 
     }
