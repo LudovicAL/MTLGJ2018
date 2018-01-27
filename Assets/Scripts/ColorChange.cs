@@ -7,7 +7,7 @@ using System;
 public class ColorChange : MonoBehaviour
 {
 
-
+    //I love you Christ
 
     List<Vector2> GridList = new List<Vector2>();
     Color CurrentColor;
