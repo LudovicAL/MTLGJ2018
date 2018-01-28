@@ -18,14 +18,17 @@ public class CanvasManager : MonoBehaviour {
 	private Text textSurvivors;
 	private Text textRatio;
 	private List<GameObject> workerButtons;
+    private float m_SuccessRatioNeeded = 0.3f;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 		eg = GameObject.Find ("Scriptsbucket").GetComponent<EndGame>();
 		GameObject.Find ("Button Start").GetComponent<Button> ().onClick.AddListener (StartButtonPress);
 		GameObject.Find ("Button Quit").GetComponent<Button> ().onClick.AddListener (QuitButtonPress);
-		//GameObject.Find ("Button Menu").GetComponent<Button> ().onClick.AddListener (MenuButtonPress);
-		textCasualties = GameObject.Find ("Text Casualties").GetComponent<Text> ();
+        GameObject.Find("Button Abandon").GetComponent<Button>().onClick.AddListener(QuitButtonPress);
+        GameObject.Find("Button Continue").GetComponent<Button>().onClick.AddListener(ContinueButtonPress);
+        //GameObject.Find ("Button Menu").GetComponent<Button> ().onClick.AddListener (MenuButtonPress);
+        textCasualties = GameObject.Find ("Text Casualties").GetComponent<Text> ();
 		textSurvivors = GameObject.Find ("Text Survivors").GetComponent<Text> ();
 		textRatio = GameObject.Find ("Text Ratio").GetComponent<Text> ();
 		panelGame = GameObject.Find ("Panel Game");
@@ -82,11 +85,13 @@ public class CanvasManager : MonoBehaviour {
 	void UpdateWorkerButtons(bool _isInCameraMode)
 	{
 		foreach (GameObject go in workerButtons) {
-			Transform backgroundImage = go.transform.FindChild ("BackgroundImage");
+			Transform backgroundImage = go.transform.Find ("BackgroundImage");
 			if (backgroundImage != null) {
-				backgroundImage.GetComponent<Image> ().color = _isInCameraMode ? Color.green : Color.yellow;
+				Color updatedColor = _isInCameraMode ? Color.green : Color.yellow;
+				updatedColor.a = 0.78f; // alpha
+				backgroundImage.GetComponent<Image> ().color = updatedColor;
 			}
-			Transform workerImage = go.transform.FindChild ("Image Worker");
+			Transform workerImage = go.transform.Find ("Image Worker");
 			if (workerImage != null) {
 				workerImage.GetComponent<Image> ().sprite = _isInCameraMode ? spriteFreeWorker : spriteBusyWorker;
 			}
@@ -101,8 +106,13 @@ public class CanvasManager : MonoBehaviour {
 		Application.Quit();
 	}
 
-	//Listener functions a defined for every GameState
-	protected void OnMenu() {
+    public void ContinueButtonPress()
+    {
+        Application.LoadLevel(Application.loadedLevel);
+    }
+
+    //Listener functions a defined for every GameState
+    protected void OnMenu() {
 		SetState (StaticData.AvailableGameStates.Menu);
 		showPanel ("Panel Menu");
 	}
@@ -139,13 +149,21 @@ public class CanvasManager : MonoBehaviour {
 		
 		showPanel ("Panel End");
         Camera camera = Camera.main;
-        GameObject cameraPos = GameObject.Find("Main Camera");
-        cameraPos.transform.position = new Vector3(0, 0);
-        camera.orthographicSize = 3.5f;
+        camera.transform.position = new Vector3(0, 0);
+        camera.orthographicSize = 3f;
 
         textCasualties.text = eg.m_NumberOfCasualties.ToString ();
 		textSurvivors.text = eg.m_NumberOfCivilians.ToString ();
-		float ratio = eg.m_NumberOfCivilians / (eg.m_NumberOfCasualties + eg.m_NumberOfCivilians);
-		textRatio.text = string.Format("{0:P2}.", ratio);
+		float ratio = (float)eg.m_NumberOfCivilians / ((float)eg.m_NumberOfCasualties + (float)eg.m_NumberOfCivilians);
+		textRatio.text =  ratio.ToString("0.0%");
+
+        if (ratio >= m_SuccessRatioNeeded)
+        {
+            GameObject.Find("WhatsNext").GetComponent<Text>().text = "Continue";
+        }
+        else
+        {
+            GameObject.Find("WhatsNext").GetComponent<Text>().text = "Restart";
+        }
     }
 }
