@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class CanvasManager : MonoBehaviour {
 
 	public GameObject workerButtonPrefab;
-	public int numberOfWorkers = 3;
+	public int numberOfWorkers = 1;
 	private EndGame eg;
 	private GameObject panelGame;
 	private GameStatesManager gameStatesManager;	//Refers to the GameStateManager
