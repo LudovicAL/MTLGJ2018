@@ -66,8 +66,7 @@ public class EndGame : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-
-        if (colorChange.CountOfInfected == 0 || colorChange.CountOfInfected == colorChange.StartingCivilians)
+        if (colorChange.CountOfInfected == 0 || colorChange.CountOfCivilians <= colorChange.StartingCivilians*.01)
         {
             EndOfGame();
         }
