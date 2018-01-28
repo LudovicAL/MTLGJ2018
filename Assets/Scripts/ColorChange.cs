@@ -23,13 +23,13 @@ public class ColorChange : MonoBehaviour
 	bool m_HasMapReader = false;
 	float m_ZombieConversionRange = 0.05f;
     public int CountOfInfected;
-    public int StartingCivilians = 3000;
+    int StartingCivilians = 3000;
     public int CountOfCivilians ;
 
     public AudioClip Afraid;
     public AudioClip Moans;
     private AudioSource Source;
-    int m_NumberOfZombies = 1;
+    int m_NumberOfZombies = 2;
 
     int m_MaxNumberOfInfectedToUpdateEachFrame = 100;
 	int m_InfectedIndex = 0;
@@ -38,7 +38,9 @@ public class ColorChange : MonoBehaviour
 	//Makes the initial spread faster
 	float m_StartingZombieBoost = 2.0f;
 	float m_CurrentZombieBoost = 0.0f;
-	float m_ZombieBoostDegradeAmountPerNewZombie = 0.1f;
+	float m_ZombieBoostDegradeAmountPerNewZombie = 0.05f;
+
+    float m_BaseEatingSpeed = .05f;
 
     // Use this for initialization
     void Start()
@@ -106,7 +108,7 @@ public class ColorChange : MonoBehaviour
 	            switch (m_Civilians[i].tag)
 	            {
 	                case "Eating":
-						ZombieDecay(m_Civilians[i],i, -0.025f * m_CurrentZombieBoost);
+						ZombieDecay(m_Civilians[i],i, -m_BaseEatingSpeed * m_CurrentZombieBoost);
 	                    if (!IsHungry(m_Civilians[i]))
 	                    {
 	                        m_Civilians[i].tag = "Infected";
@@ -151,12 +153,13 @@ public class ColorChange : MonoBehaviour
 			}
 		}
     }
+    float m_RegTarget = 0.5f;
 
-	void ZombieDecay(GameObject ActiveInfected, int humanIndex, float DecayRate)
+    void ZombieDecay(GameObject ActiveInfected, int humanIndex, float DecayRate)
     {
         SpriteRenderer ActiveSprite;
         ActiveSprite = ActiveInfected.transform.GetComponent<SpriteRenderer>();
-        float RegTarget = 0.5f;
+        
         float BlueTarget = .01f;
         float InfectionRate = .04f;
 
@@ -172,7 +175,7 @@ public class ColorChange : MonoBehaviour
         }
         else
         {
-            if (Red <= RegTarget)
+            if (Red <= m_RegTarget)
             {
                 Green = ActiveSprite.color.g - DecayRate * Time.deltaTime;
                 Red = ActiveSprite.color.r - DecayRate * Time.deltaTime;
@@ -298,7 +301,7 @@ public class ColorChange : MonoBehaviour
 		float terrorModifier = 1.0f;
 		if (ActiveHuman.tag != "Infected" && m_GridsWithZombies [m_CivilianGridIndex[humanIndex]]) 
 		{
-			terrorModifier = 0.5f * (float)CountOfInfected;
+			terrorModifier = 0.25f * (float)CountOfInfected;
 
 			if (terrorModifier > 4.0f) 
 			{
@@ -333,13 +336,13 @@ public class ColorChange : MonoBehaviour
     {
         SpriteRenderer ActiveSprite;
         ActiveSprite = ActiveInfected.transform.GetComponent<SpriteRenderer>();
-        if (ActiveSprite.color.r <= .5f) { return true; }
+        if (ActiveSprite.color.r <= m_RegTarget) { return true; }
         return false;
     }
 
-    int m_GridWidth = 18;
-    int m_GridHeight = 14;
-    float m_GridCellWidthHeight = 0.5f;
+    int m_GridWidth = 9;
+    int m_GridHeight = 7;
+    float m_GridCellWidthHeight = 1f;
     Vector3 m_GridOffset;
 
     List<List<GameObject>> GameObjectGridList = new List<List<GameObject>>();
@@ -485,8 +488,8 @@ public class ColorChange : MonoBehaviour
             int randomCivilian = UnityEngine.Random.Range(0, index);
             objects[randomCivilian].tag = "Infected";
             SoundManager(objects[randomCivilian]);
-            CountOfInfected += 1;
         }
+        CountOfInfected += m_NumberOfZombies;
     }
 
     void SoundManager(GameObject ActiveObject)

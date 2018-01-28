@@ -18,6 +18,7 @@ public class ControlsManager : MonoBehaviour {
 	private bool movingScreen;
 	private GameStatesManager gameStatesManager;	//Refers to the GameStateManager
 	private StaticData.AvailableGameStates gameState;	//Mimics the GameStateManager's gameState variable at all time
+	private bool isInCameraMode; // vs WorkerMode
 	GameObject m_MapReaderObject;
 
 	// Use this for initialization
@@ -32,6 +33,7 @@ public class ControlsManager : MonoBehaviour {
 		movingScreen = false;
 		screenWidth = Screen.width;
 		screenHeight = Screen.height;
+		isInCameraMode = true;
 		hollowLine = GameObject.Find("Line").GetComponent<LineRenderer>();
 		gameStatesManager = GameObject.Find ("Scriptsbucket").GetComponent<GameStatesManager>();
 		gameStatesManager.MenuGameState.AddListener(OnMenu);
@@ -342,5 +344,15 @@ public class ControlsManager : MonoBehaviour {
 	//Use this function to request a game state change from the GameStateManager
 	private void RequestGameStateChange(StaticData.AvailableGameStates state) {
 		gameStatesManager.ChangeGameState (state);
+	}
+
+	public void ToggleCameraMode()
+	{
+		isInCameraMode = !isInCameraMode;
+	}
+
+	public bool GetIsInCameraMode()
+	{
+		return isInCameraMode;
 	}
 }

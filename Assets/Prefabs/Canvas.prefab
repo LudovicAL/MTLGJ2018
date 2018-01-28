@@ -545,7 +545,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   workerButtonPrefab: {fileID: 1489473994575126, guid: 8096e296d9e6d7648a38917b5047f4fa,
     type: 2}
-  numberOfWorkers: 3
+  numberOfWorkers: 1
 --- !u!114 &114333742043880222
 MonoBehaviour:
   m_ObjectHideFlags: 1
