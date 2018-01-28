@@ -26,6 +26,7 @@ public class ControlsManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		Debug.Log ("Multitouch supported: " + Input.multiTouchEnabled);
 		distanceBetweenFingers = 0.0f;
 		wallConstructionMode = false;
 		nextUpdateTime = 0.0f;
@@ -84,10 +85,12 @@ public class ControlsManager : MonoBehaviour {
 			distanceBetweenFingers = Vector2.Distance(Input.GetTouch(0).position, Input.GetTouch(1).position);
 			ScreenZoomBegan ();
 		} else if (Input.touches[0].phase != TouchPhase.Stationary || Input.touches[1].phase != TouchPhase.Stationary) {
-			float newDistance = distanceBetweenFingers = Vector2.Distance(Input.GetTouch(0).position, Input.GetTouch(1).position);
-			float direction = newDistance - distanceBetweenFingers;
-			ScreenZoomMoved (Mathf.Sign(direction));
-			distanceBetweenFingers = newDistance;
+			if (zoomingScreen)  {
+				float newDistance = distanceBetweenFingers = Vector2.Distance(Input.GetTouch(0).position, Input.GetTouch(1).position);
+				float direction = newDistance - distanceBetweenFingers;
+				ScreenZoomMoved (Mathf.Sign(direction));
+				distanceBetweenFingers = newDistance;
+			}
 		}
 	}
 		
@@ -208,9 +211,8 @@ public class ControlsManager : MonoBehaviour {
 	//Player kept asking to move the screen in the current frame
 	private void MovingScreenMoved() {
 		if (movingScreen) {
-			Vector2 movement = Input.GetTouch(0).deltaPosition + Input.GetTouch(1).deltaPosition;
-			MoveCameraHorizontally (Mathf.Sign (movement.x));
-			MoveCameraVertically (Mathf.Sign (movement.y));
+			MoveCameraHorizontally (Mathf.Sign (Input.GetTouch(0).deltaPosition.x));
+			MoveCameraVertically (Mathf.Sign (Input.GetTouch(0).deltaPosition.y));
 		}
 	}
 
@@ -270,9 +272,9 @@ public class ControlsManager : MonoBehaviour {
 	//A wall has to be drawn
 	private void DrawWall() {
 		GameObject mapReaderObject = GameObject.Find ("Map");
-		if (mapReaderObject == null)
+		if (mapReaderObject == null) {
 			return;
-
+		}
 		mapReaderObject.GetComponent<MapReader> ().AddWall (coordList);
 	}
 	

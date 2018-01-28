@@ -39,7 +39,16 @@ public class MapReader : MonoBehaviour {
 			}
 		}
 	}
-	
+
+	void Start() {
+		
+		SpriteRenderer renderer = GetComponent<SpriteRenderer> ();
+		if (renderer != null) {
+			Texture2D newTex = (Texture2D)GameObject.Instantiate(MapTexture);
+			renderer.sprite = Sprite.Create(newTex, renderer.sprite.rect, new Vector2(0.5f, 0.5f));
+		}
+	}
+
 	// Update is called once per frame
 	void Update () {
 		
