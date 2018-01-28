@@ -31,55 +31,49 @@ public class ColorChange : MonoBehaviour
 	int m_InfectedIndex = 0;
 	int m_InfectedUpdatedThisFrame = 0;
 
+    float m_TimeBeforeSpawn;
+    int m_InitialActiveZombies;
+    public bool m_InitialInfectionDone;
+
     // Use this for initialization
     void Start()
     {
-		m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost = m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingZombieBoost;
-		gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
-		gameStatesManager.MenuGameState.AddListener(OnMenu);
-		gameStatesManager.StartingGameState.AddListener(OnStarting);
-		gameStatesManager.PlayingGameState.AddListener(OnPlaying);
-		gameStatesManager.PausedGameState.AddListener(OnPausing);
-		gameStatesManager.EndingGameState.AddListener(OnEnding);
-		SetState(gameStatesManager.gameState);
-        float yAxis = Civilian.position.y;
-        float xAxis = Civilian.position.x;
-        m_GridOffset = -1.0f * new Vector3((m_GridWidth * 0.5f * m_GridCellWidthHeight), (m_GridHeight * 0.5f * m_GridCellWidthHeight), 0.0f);
-		CountOfCivilians = m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingHumans;
-        if (GameObject.Find("Map") != null)
-        {
-            g_MapReader = GameObject.Find("Map").GetComponent<MapReader>();
-			m_HasMapReader = true;
-        }
-
-		for (int i = 0; i < m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingHumans; i++)
-        {
-            if (g_MapReader != null)
-            { // valid map spawn
-                float[] randomSpawnPos = g_MapReader.FindRandomWhiteSpace();
-                xAxis = randomSpawnPos[0];
-                yAxis = randomSpawnPos[1];
+            m_TimeBeforeSpawn = UnityEngine.Random.Range(2, 5);
+            m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost = m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingZombieBoost;
+            gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
+            gameStatesManager.MenuGameState.AddListener(OnMenu);
+            gameStatesManager.StartingGameState.AddListener(OnStarting);
+            gameStatesManager.PlayingGameState.AddListener(OnPlaying);
+            gameStatesManager.PausedGameState.AddListener(OnPausing);
+            gameStatesManager.EndingGameState.AddListener(OnEnding);
+            SetState(gameStatesManager.gameState);
+            float yAxis = Civilian.position.y;
+            float xAxis = Civilian.position.x;
+            m_GridOffset = -1.0f * new Vector3((m_GridWidth * 0.5f * m_GridCellWidthHeight), (m_GridHeight * 0.5f * m_GridCellWidthHeight), 0.0f);
+            CountOfCivilians = m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingHumans;
+            if (GameObject.Find("Map") != null)
+            {
+                g_MapReader = GameObject.Find("Map").GetComponent<MapReader>();
+                m_HasMapReader = true;
             }
-            //else
-            //{ // test spawn
-            //    xAxis += 2;
-            //    if (xAxis >= 35)
-            //    {
-            //        xAxis = Civilian.position.x;
-            //        yAxis += 2;
-            //    }
-            //}
+
+            for (int i = 0; i < m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingHumans; i++)
+            {
+                if (g_MapReader != null)
+                { // valid map spawn
+                    float[] randomSpawnPos = g_MapReader.FindRandomWhiteSpace();
+                    xAxis = randomSpawnPos[0];
+                    yAxis = randomSpawnPos[1];
+                }
 
 
+                Transform newCivilian = Instantiate(Civilian, new Vector3(xAxis, yAxis, 0), Quaternion.identity);
+                newCivilian.tag = "Civilian";
+            }
 
-            Transform newCivilian = Instantiate(Civilian, new Vector3(xAxis, yAxis, 0), Quaternion.identity);
-            newCivilian.tag = "Civilian";
-        }
 
-
-        BuildInitialListOfCivilians();
-        SetupGameObjectGridList();
-        InitialInfection();
+            BuildInitialListOfCivilians();
+            SetupGameObjectGridList();
 
     }
 
@@ -87,6 +81,7 @@ public class ColorChange : MonoBehaviour
     void Update()
     {
 		if (gameState == StaticData.AvailableGameStates.Playing) {
+            if (!m_InitialInfectionDone) { InitialInfection(); }
 			DrawDebugGrid();
 	        UpdateCivilianGameObjectLists();
 			m_InfectedUpdatedThisFrame = 0;
@@ -493,16 +488,24 @@ public class ColorChange : MonoBehaviour
 
     void InitialInfection()
     {
-        GameObject[] objects = GameObject.FindGameObjectsWithTag("Civilian");
-		for (int i = 1; i <= m_DifficultyParameters[m_DifficultyCurrentLevel].m_NumberOfZombies; ++i)
+        m_TimeBeforeSpawn -= Time.deltaTime;
+        if (m_TimeBeforeSpawn <= 0 )
         {
+            GameObject[] objects = GameObject.FindGameObjectsWithTag("Civilian");
+
             int index = objects.Length;
             int randomCivilian = UnityEngine.Random.Range(0, index);
             objects[randomCivilian].tag = "Infected";
             SoundManager(objects[randomCivilian]);
+
+            m_InitialActiveZombies += 1;
+            m_TimeBeforeSpawn += UnityEngine.Random.Range(2, 5);
+
+            CountOfInfected += m_InitialActiveZombies;
+            GameObject.Find("CurrentInfected").GetComponent<Text>().text = CountOfInfected + " Infected";
+            if (m_InitialActiveZombies == m_DifficultyParameters[m_DifficultyCurrentLevel].m_NumberOfZombies) { m_InitialInfectionDone = true; }
         }
-		CountOfInfected += m_DifficultyParameters[m_DifficultyCurrentLevel].m_NumberOfZombies;
-        GameObject.Find("CurrentInfected").GetComponent<Text>().text = CountOfInfected + " Infected";
+        
     }
 
     void SoundManager(GameObject ActiveObject)
