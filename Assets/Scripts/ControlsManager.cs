@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class ControlsManager : MonoBehaviour {
-	public bool wallConstructionMode;
 	public float cameraSpeed = 15.0f;
 	//public float updateGap = 0.02f;
 	private Vector3 poiterInitialPosition;
@@ -25,7 +25,6 @@ public class ControlsManager : MonoBehaviour {
 	void Start () {
 		poiterInitialPosition = Vector2.zero;
 		distanceBetweenFingers = 0.0f;
-		wallConstructionMode = false;
 		nextUpdateTime = 0.0f;
 		cameraTransform = Camera.main.transform;
 		coordList = new List<Vector2> ();
@@ -48,20 +47,21 @@ public class ControlsManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (gameState == StaticData.AvailableGameStates.Playing) {
-			//if (Application.isMobilePlatform) {	//ON MOBILE
+			if (Application.isMobilePlatform) {	//ON MOBILE
 				if (Input.touchCount > 0) {	//USER HAS FINGER(S) ON
-					if (wallConstructionMode) {
+					if (!isInCameraMode) {
 						TouchWallConstructionController ();
 					} else {
-						TouchScreenMoveController ();
+						if (!EventSystem.current.IsPointerOverGameObject()) {
+							TouchScreenMoveController ();
+						}
 					}
 				}
-			//} else {	//ON PC
-			/*
+			} else {	//ON PC
 				MouseClickController();
 				KeyboardButtonController ();
-			*/
-			//}
+
+			}
 			if (coordList.Count > 100) {
 				WallEnded (Input.mousePosition);
 			}
@@ -70,14 +70,25 @@ public class ControlsManager : MonoBehaviour {
 
 	//Decides what to do with mouse clicks
 	public void MouseClickController() {
-		if (Input.GetMouseButton(0)) { //USER IS PRESSING THE MOUSE BUTTON
-			if (Input.GetMouseButtonDown(0)) { //USER PRESSED THE MOUSE BUTTON
-				WallBegan (Input.mousePosition);
-			} else {	//USER JUST KEPT PRESSING THE MOUSE BUTTON
-				WallMoved (Input.mousePosition);
+		if (!isInCameraMode) {
+			if (Input.GetMouseButton(0)) { //USER IS PRESSING THE MOUSE BUTTON
+				if (Input.GetMouseButtonDown(0)) { //USER PRESSED THE MOUSE BUTTON
+					WallBegan (Input.mousePosition);
+				} else {	//USER JUST KEPT PRESSING THE MOUSE BUTTON
+					WallMoved (Input.mousePosition);
+				}
+			} else if (Input.GetMouseButtonUp(0)) {	//USER RELEASED THE MOUSE BUTTON
+				WallEnded (Input.mousePosition);		
 			}
-		} else if (Input.GetMouseButtonUp(0)) {	//USER RELEASED THE MOUSE BUTTON
-			WallEnded (Input.mousePosition);		
+		} else {
+			if (Input.GetMouseButton(0)) {
+				if (!(EventSystem.current.IsPointerOverGameObject())) {
+					if (Input.GetMouseButtonDown(0)) {
+						poiterInitialPosition = Input.mousePosition;
+					}
+					MoveScreenMagically(Camera.main.ScreenToWorldPoint (Input.mousePosition));
+				}
+			}
 		}
 	}
 
@@ -87,9 +98,9 @@ public class ControlsManager : MonoBehaviour {
 			poiterInitialPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		}
 		if (Input.GetButton("Horizontal") ) {	//USER IS PRESSING A HORIZONTAL ARROW KEY
-			MoveScreenMagically(Camera.main.ScreenToWorldPoint (Input.mousePosition));
+			MoveCameraHorizontally(-Mathf.Sign(Input.GetAxis("Horizontal")));
 		} else if (Input.GetButton("Vertical")) {	//USER IS PRESSING A VERTICAL ARROW KEY
-			MoveScreenMagically(Camera.main.ScreenToWorldPoint (Input.mousePosition));
+			MoveCameraVertically(-Mathf.Sign(Input.GetAxis("Vertical")));
 		}
 		if (Input.GetButton("Cancel")) {
 			Application.LoadLevel(Application.loadedLevel);
@@ -298,7 +309,6 @@ public class ControlsManager : MonoBehaviour {
 		coordList.Clear ();
 		nextUpdateTime = 0.0f;
 		buildingWall = false;
-		wallConstructionMode = false;
 		hollowLine.enabled = false;
 		hollowLine.positionCount = 0;
 	}
