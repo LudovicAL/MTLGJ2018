@@ -161,10 +161,12 @@ public class CanvasManager : MonoBehaviour {
 
         if (ratio >= m_SuccessRatioNeeded)
         {
+            GameObject.Find("Text Ratio").GetComponent<Text>().color = new Color(0.3529f, .5098f, .047f);
             GameObject.Find("WhatsNext").GetComponent<Text>().text = "Continue";
         }
         else
         {
+            GameObject.Find("Text Ratio").GetComponent<Text>().color = new Color(0.196f, 0.0078f, 0.0078f);
             GameObject.Find("WhatsNext").GetComponent<Text>().text = "Restart";
         }
     }

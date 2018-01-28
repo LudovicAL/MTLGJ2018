@@ -36,6 +36,13 @@ public class ColorChange : MonoBehaviour
     int m_InitialActiveZombies;
     public bool m_InitialInfectionDone;
 
+	private Text m_InfectedCountText;
+
+	void Awake()
+	{
+		m_InfectedCountText = GameObject.Find ("CurrentInfected").GetComponent<Text> ();
+	}
+
     // Use this for initialization
     void Start()
     {
@@ -149,7 +156,7 @@ public class ColorChange : MonoBehaviour
 			if (m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) {
 				m_InfectedIndex = 0;
 				g_MapReader.PushBloodPixels ();
-				GameObject.Find("CurrentInfected").GetComponent<Text>().text= "Living:" + CountOfCivilians + " Infected:"+ CountOfInfected + " Dead:" + DeadInfected;//" Infected";
+				m_InfectedCountText.text="Living:" + CountOfCivilians + " Infected:"+ CountOfInfected + " Dead:" + DeadInfected;
 			}
 		}
     }
@@ -518,7 +525,6 @@ public class ColorChange : MonoBehaviour
 			CountOfCivilians -= 1;
             m_TimeBeforeSpawn += UnityEngine.Random.Range(2, 5);
 
-            //GameObject.Find("CurrentInfected").GetComponent<Text>().text = CountOfInfected + " Infected";
             if (m_InitialActiveZombies == m_DifficultyParameters[m_DifficultyCurrentLevel].m_NumberOfZombies) { m_InitialInfectionDone = true; }
         }
     }
