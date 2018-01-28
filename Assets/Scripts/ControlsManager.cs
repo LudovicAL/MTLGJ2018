@@ -107,6 +107,9 @@ public class ControlsManager : MonoBehaviour {
 				if (Input.GetButton("Vertical")) {	//USER IS PRESSING A VERTICAL ARROW KEY
 					moveCameraVertically(Mathf.Sign(Input.GetAxisRaw("Vertical")));
 				}
+				if (Input.GetButton("Cancel")) {
+					RequestGameStateChange(StaticData.AvailableGameStates.Menu);
+				}
 			}
 			if (coordList.Count > 100) {
 				wallEnded (Input.mousePosition);
@@ -187,7 +190,7 @@ public class ControlsManager : MonoBehaviour {
 	private void DrawWall() {
 
 	}
-
+	
 	//Listener functions a defined for every GameState
 	protected void OnMenu() {
 		SetState (StaticData.AvailableGameStates.Menu);
@@ -210,6 +213,7 @@ public class ControlsManager : MonoBehaviour {
 	private void SetState(StaticData.AvailableGameStates state) {
 		gameState = state;
 		wallCanceled ();
+		movingScreenCanceled ();
 	}
 
 	//Use this function to request a game state change from the GameStateManager
