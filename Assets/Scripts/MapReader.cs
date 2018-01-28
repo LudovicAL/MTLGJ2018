@@ -9,6 +9,7 @@ public class MapReader : MonoBehaviour {
 	int m_Width;
 	int m_Height;
 	public Texture2D MapTexture; 
+	private Texture2D m_DrawTexture;
 
 	void Awake() {
 		//string filePath = Application.dataPath + "/Arts/ProtoCity_01.png";
@@ -19,6 +20,8 @@ public class MapReader : MonoBehaviour {
 			Debug.Log ("Could not find texture, will not load map.");
 			return;
 		}
+
+		m_DrawTexture = GameObject.Find ("Map").GetComponent<SpriteRenderer> ().sprite.texture;
 
 		m_Width = MapTexture.width;
 		m_Height = MapTexture.height;
@@ -100,27 +103,44 @@ public class MapReader : MonoBehaviour {
 			Vector2 wallCoordA = _wallCoords [i-1];
 			Vector2 wallCoordB = _wallCoords [i];
 
+			Vector2 directionVector = wallCoordB - wallCoordA;
+			Vector2 leftVector = new Vector2(-directionVector.y, directionVector.x);
+			leftVector.Normalize ();
+			Vector2 rightVector = new Vector2(directionVector.y, -directionVector.x);
+			rightVector.Normalize ();
 
-			int[] pixelCoordA = ConvertWorldCoordToPixelCoord (wallCoordA [0], wallCoordA [1]);
-			int[] pixelCoordB = ConvertWorldCoordToPixelCoord (wallCoordB [0], wallCoordB [1]);
-			MakeWallBetweenPoints_Bresenham (pixelCoordA, pixelCoordB);
+			QueueWallPixels (wallCoordA, wallCoordB);
 
-			//bool wasAWall = m_Bitmap [pixelCoord [0], pixelCoord [1]] == false;
-			//if (wasAWall) break into smaller walls
-			//m_Bitmap [pixelCoord [0], pixelCoord [1]] = false; // update unwalkable
+			for (int extraWallIndex = 0; extraWallIndex < 20; ++extraWallIndex)
+			{
+				float extraWallOffset = 0.0025f * (float)extraWallIndex;
+				QueueWallPixels (wallCoordA + (leftVector * extraWallOffset), wallCoordB + (leftVector * extraWallOffset));
+				QueueWallPixels (wallCoordA + (rightVector * extraWallOffset), wallCoordB + (rightVector * extraWallOffset));
+			}
 
-			//Debug.DrawLine(_wallCoords[i-1], _wallCoords[i]);
-			//Debug.Log ("wall coords: " + _wallCoords[i-1].ToString("F4") + ", " + _wallCoords[i].ToString("F4"));
-
-			//Debug.Log ("pixel coords: (" + pixelCoordA[0] + ", " + pixelCoordA[1] + "), (" + pixelCoordB[0] + ", " + pixelCoordB[1] + ")");
-
+			PushWallPixels ();
 		}
 	}
 
-	void MakeWallBetweenPoints_Bresenham(int[] _startPixelCoord, int[] _endPixelCoord)
+	public void QueueWallPixels(Vector2 wallCoordA, Vector2 wallCoordB)
 	{
-		Texture2D texture = GameObject.Find ("Map").GetComponent<SpriteRenderer> ().sprite.texture;
+		int[] pixelCoordA = ConvertWorldCoordToPixelCoord (wallCoordA [0], wallCoordA [1]);
+		int[] pixelCoordB = ConvertWorldCoordToPixelCoord (wallCoordB [0], wallCoordB [1]);
+		QueueWallPixelsBetweenPoints_Bresenham (pixelCoordA, pixelCoordB);
 
+		//bool wasAWall = m_Bitmap [pixelCoord [0], pixelCoord [1]] == false;
+		//if (wasAWall) break into smaller walls
+		//m_Bitmap [pixelCoord [0], pixelCoord [1]] = false; // update unwalkable
+
+		//Debug.DrawLine(_wallCoords[i-1], _wallCoords[i]);
+		//Debug.Log ("wall coords: " + _wallCoords[i-1].ToString("F4") + ", " + _wallCoords[i].ToString("F4"));
+
+		//Debug.Log ("pixel coords: (" + pixelCoordA[0] + ", " + pixelCoordA[1] + "), (" + pixelCoordB[0] + ", " + pixelCoordB[1] + ")");
+
+	}
+
+	void QueueWallPixelsBetweenPoints_Bresenham(int[] _startPixelCoord, int[] _endPixelCoord)
+	{
 		float dx = Mathf.Abs (_endPixelCoord [0] - _startPixelCoord [0]);
 		float dy = Mathf.Abs (_endPixelCoord [1] - _startPixelCoord [1]);
 
@@ -139,7 +159,7 @@ public class MapReader : MonoBehaviour {
 			float err = dx / 2.0f;
 			while (x != x1) {
 				m_Bitmap [x, y] = false;
-				texture.SetPixel ((int)x, (int)y, Color.black);
+				m_DrawTexture.SetPixel ((int)x, (int)y, Color.black);
 						
 				err -= dy;
 				if (err < 0) {
@@ -154,7 +174,7 @@ public class MapReader : MonoBehaviour {
 			float err = dy / 2.0f;
 			while (y != y1) {
 				m_Bitmap [x, y] = false;
-				texture.SetPixel ((int)x, (int)y, Color.black);
+				m_DrawTexture.SetPixel ((int)x, (int)y, Color.black);
 				err -= dx;
 				if (err < 0) {
 					x += sx;
@@ -165,8 +185,13 @@ public class MapReader : MonoBehaviour {
 		}
 
 		m_Bitmap [x1, y1] = false;
-		texture.SetPixel ((int)x1, (int)y1, Color.black);
+		m_DrawTexture.SetPixel ((int)x1, (int)y1, Color.black);
+	}
 
-		texture.Apply ();
+	void PushWallPixels()
+	{
+		m_DrawTexture.Apply ();
 	}
 }
+
+
