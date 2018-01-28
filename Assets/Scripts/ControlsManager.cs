@@ -149,7 +149,7 @@ public class ControlsManager : MonoBehaviour {
 			MoveCameraVertically(Mathf.Sign(Input.GetAxisRaw("Vertical")));
 		}
 		if (Input.GetButton("Cancel")) {
-			RequestGameStateChange(StaticData.AvailableGameStates.Menu);
+			Application.LoadLevel(Application.loadedLevel);
 		}
 		if (Input.GetButton("Fire1")) {
 			zoomingScreen = true;
