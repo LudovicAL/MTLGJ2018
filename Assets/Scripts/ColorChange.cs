@@ -87,6 +87,13 @@ public class ColorChange : MonoBehaviour
         {
             switch (m_Civilians[i].tag)
             {
+                case "Eating":
+                    ZombieDecay(m_Civilians[i],i, -0.025f);
+                    if (!IsHungry(m_Civilians[i]))
+                    {
+                        m_Civilians[i].tag = "Infected";
+                    }
+                    break;
                 case "Dead":
 
                     break;
@@ -94,15 +101,15 @@ public class ColorChange : MonoBehaviour
                 case "Civilian":
 					MoveHumanRandomly(m_Civilians[i], i, 0.3f);
                     break;
-			case "Infected":
-				ZombieDecay (m_Civilians [i], i);
+			    case "Infected":
+				    ZombieDecay (m_Civilians[i], i, 0.025f);
 
-				if (i > m_InfectedIndex && m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) 
-				{
-					++m_InfectedUpdatedThisFrame;
-					m_InfectedIndex = i;
-					GetClosestCivilian(m_Civilians[i], i);
-				}
+				    if (i > m_InfectedIndex && m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) 
+				    {
+					    ++m_InfectedUpdatedThisFrame;
+					    m_InfectedIndex = i;
+					    GetClosestCivilian(m_Civilians[i], i);
+				    }
 					
                     if (IsHungry(m_Civilians[i]))
                     {
@@ -127,14 +134,13 @@ public class ColorChange : MonoBehaviour
 
     }
 
-	void ZombieDecay(GameObject ActiveInfected, int humanIndex)
+	void ZombieDecay(GameObject ActiveInfected, int humanIndex, float DecayRate)
     {
         SpriteRenderer ActiveSprite;
         ActiveSprite = ActiveInfected.transform.GetComponent<SpriteRenderer>();
         float RegTarget = 0.5f;
         float BlueTarget = .01f;
         float InfectionRate = .04f;
-        float DecayRate = .025f;
 
         Red = ActiveSprite.color.r;
         Blue = ActiveSprite.color.b;
