@@ -13,10 +13,17 @@ public class ColorChange : MonoBehaviour
     Color CurrentColor;
     Color NewColor;
     float Red, Blue, Green;
-    float InfectedSpeed = .5f;
-    float CivilianSPeed = .1f;
+    float InfectedBaseSpeed = .5f;
+	float InfectedSpeedPlusMinus = .5f;
+    float CivilianBaseSpeed = .1f;
+	float CivilianSpeedPlusMinus = .1f;
     public Transform Civilian;
     private MapReader g_MapReader;
+	bool m_HasMapReader = false;
+
+	int m_MaxNumberOfInfectedToUpdateEachFrame = 100;
+	int m_InfectedIndex = 0;
+	int m_InfectedUpdatedThisFrame = 0;
 
 	//SOURCE TREE SUCKS MY BALLS
 
@@ -30,9 +37,10 @@ public class ColorChange : MonoBehaviour
         if (GameObject.Find("Map") != null)
         {
             g_MapReader = GameObject.Find("Map").GetComponent<MapReader>();
+			m_HasMapReader = true;
         }
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 3000; i++)
         {
             if (g_MapReader != null)
             { // valid map spawn
@@ -66,29 +74,37 @@ public class ColorChange : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+		DrawDebugGrid();
         UpdateCivilianGameObjectLists();
+		m_InfectedUpdatedThisFrame = 0;
 
         int amountOfCivilians = m_Civilians.Length;
         for (int i = 0; i < amountOfCivilians; ++i)
         {
-
-
             switch (m_Civilians[i].tag)
             {
                 case "Dead":
 
                     break;
+					
                 case "Civilian":
-
+					MoveRandomly(m_Civilians[i]);
                     break;
-                case "Infected":
-                    ZombieDecay(m_Civilians[i]);
-                    GameObject target = GetClosestCivilian(m_Civilians[i], i);
+			case "Infected":
+				ZombieDecay (m_Civilians [i]);
+
+				if (i > m_InfectedIndex && m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) 
+				{
+					++m_InfectedUpdatedThisFrame;
+					m_InfectedIndex = i;
+					GetClosestCivilian(m_Civilians[i], i);
+				}
+					
                     if (IsHungry(m_Civilians[i]))
                     {
-                        if (target != null)
+						if (m_InfectedTargets[i] != null)
                         {
-                            RushCivilian(m_Civilians[i], target);
+							RushCivilian(m_Civilians[i], m_InfectedTargets[i]);
                         }
                         else
                         {
@@ -100,6 +116,10 @@ public class ColorChange : MonoBehaviour
             }
 
         }
+
+		if (m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) {
+			m_InfectedIndex = 0;
+		}
 
     }
 
@@ -150,7 +170,7 @@ public class ColorChange : MonoBehaviour
 
     }
 
-    GameObject GetClosestCivilian(GameObject ActiveInfected, int i)
+    void GetClosestCivilian(GameObject ActiveInfected, int i)
     {
 
         GameObject bestTarget = null;
@@ -171,12 +191,14 @@ public class ColorChange : MonoBehaviour
             }
         }
 
-        return bestTarget;
-
+		m_InfectedTargets[i] = bestTarget;
     }
 
     void RushCivilian(GameObject ActiveInfected, GameObject Target)
     {
+		if (Target == null)
+			return;
+		
         Vector3 targetPosition = Target.transform.position;
 
         if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= .1f)
@@ -185,21 +207,55 @@ public class ColorChange : MonoBehaviour
         }
         else
         {
-            ActiveInfected.transform.position =
-                Vector3.MoveTowards(
-                ActiveInfected.transform.position,
-                targetPosition,
-                InfectedSpeed * Time.deltaTime);
+			Vector3 newDirection = Vector3.Normalize(targetPosition - ActiveInfected.transform.position);
+			Vector3 newDestination = ActiveInfected.transform.position + (newDirection * InfectedBaseSpeed * Time.deltaTime);
+
+			if (CanMove (newDestination)) 
+			{
+				ActiveInfected.transform.position = newDestination;
+			} 
+			else 
+			{
+				Vector3 newDestinationX = ActiveInfected.transform.position + (new Vector3(newDirection.x, 0.0f, 0.0f) * InfectedBaseSpeed * Time.deltaTime);
+				Vector3 newDestinationY = ActiveInfected.transform.position + (new Vector3(0.0f, newDirection.y, 0.0f) * InfectedBaseSpeed * Time.deltaTime);
+
+				if (newDirection.x > newDirection.y) 
+				{
+					if (CanMove (newDestinationX)) 
+					{
+						ActiveInfected.transform.position = newDestinationX;
+					} 
+					else if (CanMove (newDestinationY)) 
+					{
+						ActiveInfected.transform.position = newDestinationY;
+					}
+				} 
+				else 
+				{
+					if (CanMove (newDestinationY)) 
+					{
+						ActiveInfected.transform.position = newDestinationY;
+					} 
+					else if (CanMove (newDestinationX)) 
+					{
+						ActiveInfected.transform.position = newDestinationX;
+					}
+				}
+			}	
         }
     }
 
     void MoveRandomly(GameObject ActiveInfected)
     {
-        ActiveInfected.transform.position =
-            Vector3.MoveTowards(
-            ActiveInfected.transform.position,
-            ActiveInfected.transform.position + new Vector3(UnityEngine.Random.Range(-1.0f, 1.0f), UnityEngine.Random.Range(-1.0f, 1.0f), 0.0f),
-                InfectedSpeed * Time.deltaTime * 3.0f);
+
+		Vector3 newDestination =  Vector3.MoveTowards(
+			ActiveInfected.transform.position,
+			ActiveInfected.transform.position + new Vector3(UnityEngine.Random.Range(-1.0f, 1.0f), UnityEngine.Random.Range(-1.0f, 1.0f), 0.0f),
+			InfectedBaseSpeed * Time.deltaTime);
+		if (CanMove(newDestination))
+		{
+			ActiveInfected.transform.position = newDestination;
+		}   
     }
 
     bool IsHungry(GameObject ActiveInfected)
@@ -210,16 +266,17 @@ public class ColorChange : MonoBehaviour
         return false;
     }
 
-    int m_GridWidth = 50;
-    int m_GridHeight = 50;
-    float m_GridCellWidthHeight = 8.0f;
+    int m_GridWidth = 18;
+    int m_GridHeight = 14;
+    float m_GridCellWidthHeight = 0.5f;
     Vector3 m_GridOffset;
 
     List<List<GameObject>> GameObjectGridList = new List<List<GameObject>>();
     GameObject[] m_Civilians;
     int[] m_CivilianGridIndex;
-	int[] m_HumanSpeeds;
+	float[] m_HumanSpeeds;
 	Vector3[] m_HumanHeadings;
+	GameObject[] m_InfectedTargets;
 
     void BuildInitialListOfCivilians()
     {
@@ -227,16 +284,19 @@ public class ColorChange : MonoBehaviour
 
         int amountOfCivilians = m_Civilians.Length;
         m_CivilianGridIndex = new int[amountOfCivilians];
-		m_HumanSpeeds = new Vector3[amountOfCivilians];
+		m_HumanSpeeds = new float[amountOfCivilians];
 		m_HumanHeadings = new Vector3[amountOfCivilians];
+		m_InfectedTargets = new GameObject[amountOfCivilians];
 
         for (int i = 0; i < amountOfCivilians; ++i)
         {
             m_CivilianGridIndex[i] = 0;
-			m_HumanSpeeds [i] = 0;
-			m_HumanHeadings[i] = new Vector3(0.0f, 0.0f, 0.0f);
+			m_HumanSpeeds [i] = CivilianBaseSpeed;
+			m_HumanHeadings[i].x = 1.0f;
+			m_HumanHeadings[i].y = 1.0f;
+			m_HumanHeadings[i].z = 0.0f;
+			m_InfectedTargets[i] = null;
         }
-
     }
 
     void SetupGameObjectGridList()
@@ -310,6 +370,14 @@ public class ColorChange : MonoBehaviour
 
         return new Vector3(x * m_GridCellWidthHeight, y * m_GridCellWidthHeight, 0.0f) + m_GridOffset + new Vector3(m_GridCellWidthHeight * 0.5f, m_GridCellWidthHeight * 0.5f);
     }
+
+	bool CanMove(Vector3 destination)
+	{
+		if (!m_HasMapReader)
+			return false;
+		
+		return g_MapReader.CanMoveThere(destination[0], destination[1]);
+	}
 
 
     void InitialInfect()
