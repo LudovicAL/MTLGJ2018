@@ -163,11 +163,13 @@ public class CanvasManager : MonoBehaviour {
         {
             GameObject.Find("Text Ratio").GetComponent<Text>().color = new Color(0.3529f, .5098f, .047f);
             GameObject.Find("WhatsNext").GetComponent<Text>().text = "Continue";
+			GameObject.Find("Text WinLose").GetComponent<Text>().text = "You win";
         }
         else
         {
             GameObject.Find("Text Ratio").GetComponent<Text>().color = new Color(0.196f, 0.0078f, 0.0078f);
             GameObject.Find("WhatsNext").GetComponent<Text>().text = "Restart";
+			GameObject.Find("Text WinLose").GetComponent<Text>().text = "You lose";
         }
     }
 }
