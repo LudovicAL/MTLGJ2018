@@ -121,6 +121,12 @@ public class MapReader : MonoBehaviour {
 	{
 		Texture2D texture = GameObject.Find ("Map").GetComponent<SpriteRenderer> ().sprite.texture;
 
+		// clamp outside points
+		_startPixelCoord [0] = Mathf.Clamp (_startPixelCoord [0], 0, m_Width-1);
+		_startPixelCoord [1] = Mathf.Clamp (_startPixelCoord [1], 0, m_Height-1);
+		_endPixelCoord [0] = Mathf.Clamp (_endPixelCoord [0], 0, m_Width-1);
+		_endPixelCoord [1] = Mathf.Clamp (_endPixelCoord [1], 0, m_Height-1);
+
 		float dx = Mathf.Abs (_endPixelCoord [0] - _startPixelCoord [0]);
 		float dy = Mathf.Abs (_endPixelCoord [1] - _startPixelCoord [1]);
 
