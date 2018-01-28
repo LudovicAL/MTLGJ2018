@@ -8,7 +8,7 @@ public class TestMovement : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		g_MapReader = GameObject.Find ("MapReader").GetComponent<MapReader> ();
+		g_MapReader = GameObject.Find ("Map").GetComponent<MapReader> ();
 	}
 	
 	// Update is called once per frame

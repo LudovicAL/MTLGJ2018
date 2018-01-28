@@ -188,7 +188,11 @@ public class ControlsManager : MonoBehaviour {
 	}
 	
 	private void DrawWall() {
+		GameObject mapReaderObject = GameObject.Find ("Map");
+		if (mapReaderObject == null)
+			return;
 
+		mapReaderObject.GetComponent<MapReader> ().AddWall (coordList);
 	}
 	
 	//Listener functions a defined for every GameState
