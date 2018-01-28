@@ -500,6 +500,7 @@ public class ColorChange : MonoBehaviour
             SoundManager(objects[randomCivilian]);
         }
 		CountOfInfected += m_DifficultyParameters[m_DifficultyCurrentLevel].m_NumberOfZombies;
+        GameObject.Find("CurrentInfected").GetComponent<Text>().text = CountOfInfected + " Infected";
     }
 
     void SoundManager(GameObject ActiveObject)
