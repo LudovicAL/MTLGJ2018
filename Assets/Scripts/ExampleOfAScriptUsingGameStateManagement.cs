@@ -14,7 +14,7 @@ public class ExampleOfAScriptUsingGameStateManagement : MonoBehaviour {
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
 		gameStatesManager.PlayingGameState.AddListener(OnPlaying);
 		gameStatesManager.PausedGameState.AddListener(OnPausing);
-		gameStatesManager.PausedGameState.AddListener(OnEnding);
+		gameStatesManager.EndingGameState.AddListener(OnEnding);
 		SetState (gameStatesManager.gameState);
 	}
 		

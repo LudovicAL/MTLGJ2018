@@ -20,6 +20,7 @@ public class CanvasManager : MonoBehaviour {
 		eg = GameObject.Find ("Scriptsbucket").GetComponent<EndGame>();
 		GameObject.Find ("Button Start").GetComponent<Button> ().onClick.AddListener (StartButtonPress);
 		GameObject.Find ("Button Quit").GetComponent<Button> ().onClick.AddListener (QuitButtonPress);
+		GameObject.Find ("Button Menu").GetComponent<Button> ().onClick.AddListener (MenuButtonPress);
 		textCasualties = GameObject.Find ("Text Casualties").GetComponent<Text> ();
 		textSurvivors = GameObject.Find ("Text Survivors").GetComponent<Text> ();
 		textRatio = GameObject.Find ("Text Ratio").GetComponent<Text> ();
@@ -29,7 +30,7 @@ public class CanvasManager : MonoBehaviour {
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
 		gameStatesManager.PlayingGameState.AddListener(OnPlaying);
 		gameStatesManager.PausedGameState.AddListener(OnPausing);
-		gameStatesManager.PausedGameState.AddListener(OnEnding);
+		gameStatesManager.EndingGameState.AddListener(OnEnding);
 		SetState (gameStatesManager.gameState);
 		for (int i = 0; i < numberOfWorkers; i++) {
 			int index = i;
@@ -42,6 +43,10 @@ public class CanvasManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
+	}
+
+	public void MenuButtonPress() {
+		Application.LoadLevel(Application.loadedLevel);
 	}
 
 	private void showPanel(string panelName) {
