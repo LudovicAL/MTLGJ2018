@@ -21,7 +21,8 @@ public class ColorChange : MonoBehaviour
 	bool m_HasMapReader = false;
 
     public int CountOfInfected;
-    public int CountOfCivilians ;
+	public int DeadInfected;
+    public int CountOfCivilians;
 
     public AudioClip Afraid;
     public AudioClip Moans;
@@ -148,7 +149,7 @@ public class ColorChange : MonoBehaviour
 			if (m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) {
 				m_InfectedIndex = 0;
 				g_MapReader.PushBloodPixels ();
-				GameObject.Find("CurrentInfected").GetComponent<Text>().text= CountOfInfected + " Infected";
+				GameObject.Find("CurrentInfected").GetComponent<Text>().text= "Living:" + CountOfCivilians + " Infected:"+ CountOfInfected + " Dead:" + DeadInfected;//" Infected";
 			}
 		}
     }
@@ -205,7 +206,8 @@ public class ColorChange : MonoBehaviour
 		Color ActiveSpriteColor = ZombieRenderer.color;
 		ZombieRenderer.color = new Color(0.0f, 0.0f, 0.0f, 0.40f);
 		DyingInfected.tag = "Dead";
-		CountOfInfected -= 1;
+		//CountOfInfected -= 1;
+		DeadInfected += 1;
 	}
 
     void GetClosestCivilian(GameObject ActiveInfected, int i)
@@ -512,13 +514,13 @@ public class ColorChange : MonoBehaviour
             SoundManager(objects[randomCivilian]);
 
             m_InitialActiveZombies += 1;
-			CountOfInfected += m_InitialActiveZombies;
+			CountOfInfected += 1;
+			CountOfCivilians -= 1;
             m_TimeBeforeSpawn += UnityEngine.Random.Range(2, 5);
 
-            GameObject.Find("CurrentInfected").GetComponent<Text>().text = CountOfInfected + " Infected";
+            //GameObject.Find("CurrentInfected").GetComponent<Text>().text = CountOfInfected + " Infected";
             if (m_InitialActiveZombies == m_DifficultyParameters[m_DifficultyCurrentLevel].m_NumberOfZombies) { m_InitialInfectionDone = true; }
         }
-        
     }
 
     void SoundManager(GameObject ActiveObject)
