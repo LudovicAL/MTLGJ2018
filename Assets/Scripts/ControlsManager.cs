@@ -259,8 +259,14 @@ public class ControlsManager : MonoBehaviour {
 		m_WallFinished = false;
 		hollowLine.positionCount = 0;
 		hollowLine.enabled = true;
-		m_PreviousCoord = Camera.main.ScreenToWorldPoint (coord);
-		m_PreviousCoord.z = 0;
+
+		Vector3 convertedCoord = Camera.main.ScreenToWorldPoint (coord);
+		if (!m_MapReaderObject.GetComponent<MapReader> ().CanMoveThere (convertedCoord [0], convertedCoord [1])) 
+		{
+			m_PreviousCoord = convertedCoord;
+			m_PreviousCoord.z = 0;
+			m_FoundStartingPoint = true;
+		}
 	}
 
 

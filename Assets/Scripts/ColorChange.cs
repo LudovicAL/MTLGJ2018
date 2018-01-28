@@ -35,9 +35,15 @@ public class ColorChange : MonoBehaviour
 	int m_InfectedIndex = 0;
 	int m_InfectedUpdatedThisFrame = 0;
 
+	//Makes the initial spread faster
+	float m_StartingZombieBoost = 2.0f;
+	float m_CurrentZombieBoost = 0.0f;
+	float m_ZombieBoostDegradeAmountPerNewZombie = 0.1f;
+
     // Use this for initialization
     void Start()
     {
+		m_CurrentZombieBoost = m_StartingZombieBoost;
 		gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
 		gameStatesManager.MenuGameState.AddListener(OnMenu);
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
@@ -100,7 +106,7 @@ public class ColorChange : MonoBehaviour
 	            switch (m_Civilians[i].tag)
 	            {
 	                case "Eating":
-	                    ZombieDecay(m_Civilians[i],i, -0.025f);
+						ZombieDecay(m_Civilians[i],i, -0.025f * m_CurrentZombieBoost);
 	                    if (!IsHungry(m_Civilians[i]))
 	                    {
 	                        m_Civilians[i].tag = "Infected";
@@ -236,6 +242,15 @@ public class ColorChange : MonoBehaviour
                 m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (InfectedBaseSpeed - InfectedSpeedPlusMinus, InfectedBaseSpeed + InfectedSpeedPlusMinus); 
 				//GameObject.Instantiate (m_BloodSplat).transform.position = Target.transform.position;
 				//Do this in the texture. AURELIE! HERE! <3
+
+				if (m_CurrentZombieBoost > 1.0f) {
+					m_CurrentZombieBoost -= m_ZombieBoostDegradeAmountPerNewZombie;
+					if (m_CurrentZombieBoost < 1.0f) 
+					{
+						m_CurrentZombieBoost = 1.0f;
+					}
+				} 
+
 			}
         }
         else
@@ -249,8 +264,8 @@ public class ColorChange : MonoBehaviour
 			} 
 			else 
 			{
-				Vector3 newDestinationX = ActiveInfected.transform.position + (new Vector3(newDirection.x, 0.0f, 0.0f) * InfectedBaseSpeed * Time.deltaTime);
-				Vector3 newDestinationY = ActiveInfected.transform.position + (new Vector3(0.0f, newDirection.y, 0.0f) * InfectedBaseSpeed * Time.deltaTime);
+				Vector3 newDestinationX = ActiveInfected.transform.position + (new Vector3(newDirection.x, 0.0f, 0.0f) * m_CurrentZombieBoost * Time.deltaTime);
+				Vector3 newDestinationY = ActiveInfected.transform.position + (new Vector3(0.0f, newDirection.y, 0.0f) * m_CurrentZombieBoost * Time.deltaTime);
 
 				if (newDirection.x > newDirection.y) 
 				{
@@ -281,11 +296,26 @@ public class ColorChange : MonoBehaviour
 	void MoveHumanRandomly(GameObject ActiveHuman, int humanIndex, float maxRandomGradualHeadingChange)
 	{
 		float terrorModifier = 1.0f;
-		if (ActiveHuman.tag != "Infected" && m_GridsWithZombies [m_CivilianGridIndex[humanIndex]]) {
-			terrorModifier = 4.0f;
+		if (ActiveHuman.tag != "Infected" && m_GridsWithZombies [m_CivilianGridIndex[humanIndex]]) 
+		{
+			terrorModifier = 0.5f * (float)CountOfInfected;
+
+			if (terrorModifier > 4.0f) 
+			{
+				terrorModifier = 4.0f;
+			}
 		}
-		Vector3 newDestination = ActiveHuman.transform.position + (m_HumanSpeeds[humanIndex] * m_HumanHeadings[humanIndex] * m_HumanHealthIndex [humanIndex]* terrorModifier * Time.deltaTime);
-		
+
+		Vector3 newDestination;
+		if (ActiveHuman.tag == "Infected") 
+		{
+			newDestination = ActiveHuman.transform.position + (m_HumanSpeeds [humanIndex] * m_HumanHeadings [humanIndex] * m_HumanHealthIndex [humanIndex] * m_StartingZombieBoost * Time.deltaTime);
+		} 
+		else 
+		{
+			newDestination = ActiveHuman.transform.position + (m_HumanSpeeds[humanIndex] * m_HumanHeadings[humanIndex] * m_HumanHealthIndex [humanIndex]* terrorModifier * Time.deltaTime);
+		}
+
 		if (CanMove (newDestination)) {
 			ActiveHuman.transform.position = newDestination;
 			Vector3 newGradualRandomHeadingchange = new Vector3 (UnityEngine.Random.Range (-maxRandomGradualHeadingChange, maxRandomGradualHeadingChange), UnityEngine.Random.Range (-maxRandomGradualHeadingChange, maxRandomGradualHeadingChange), 0.0f);

@@ -114,7 +114,7 @@ public class MapReader : MonoBehaviour {
 
 			QueueWallPixels (wallCoordA, wallCoordB);
 
-			for (int extraWallIndex = 0; extraWallIndex < 20; ++extraWallIndex)
+			for (int extraWallIndex = 0; extraWallIndex < 25; ++extraWallIndex)
 			{
 				float extraWallOffset = 0.0025f * (float)extraWallIndex;
 				QueueWallPixels (wallCoordA + (leftVector * extraWallOffset), wallCoordB + (leftVector * extraWallOffset));

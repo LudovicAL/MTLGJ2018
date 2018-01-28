@@ -20,7 +20,7 @@ public class CanvasManager : MonoBehaviour {
 		eg = GameObject.Find ("Scriptsbucket").GetComponent<EndGame>();
 		GameObject.Find ("Button Start").GetComponent<Button> ().onClick.AddListener (StartButtonPress);
 		GameObject.Find ("Button Quit").GetComponent<Button> ().onClick.AddListener (QuitButtonPress);
-		GameObject.Find ("Button Menu").GetComponent<Button> ().onClick.AddListener (MenuButtonPress);
+		//GameObject.Find ("Button Menu").GetComponent<Button> ().onClick.AddListener (MenuButtonPress);
 		textCasualties = GameObject.Find ("Text Casualties").GetComponent<Text> ();
 		textSurvivors = GameObject.Find ("Text Survivors").GetComponent<Text> ();
 		textRatio = GameObject.Find ("Text Ratio").GetComponent<Text> ();
