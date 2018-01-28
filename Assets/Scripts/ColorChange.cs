@@ -488,8 +488,8 @@ public class ColorChange : MonoBehaviour
             int randomCivilian = UnityEngine.Random.Range(0, index);
             objects[randomCivilian].tag = "Infected";
             SoundManager(objects[randomCivilian]);
-            CountOfInfected += 1;
         }
+        CountOfInfected += m_NumberOfZombies;
     }
 
     void SoundManager(GameObject ActiveObject)
