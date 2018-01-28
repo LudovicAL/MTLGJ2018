@@ -10,6 +10,7 @@ public class MapReader : MonoBehaviour {
 	int m_Height;
 	public Texture2D MapTexture; 
 	private Texture2D m_DrawTexture;
+	private Texture2D m_ColoredWallTexture;
 
 	void Awake() {
 
@@ -19,6 +20,11 @@ public class MapReader : MonoBehaviour {
 		}
 
 		m_DrawTexture = GameObject.Find ("Map").GetComponent<SpriteRenderer> ().sprite.texture;
+		m_ColoredWallTexture = GameObject.Find ("BlankMapForWalls").GetComponent<SpriteRenderer> ().sprite.texture;
+
+		if (m_ColoredWallTexture == null) {
+			Debug.Log ("Could not find blank wall texture, will not load map.");
+		}
 
 		m_Width = MapTexture.width;
 		m_Height = MapTexture.height;
@@ -39,7 +45,16 @@ public class MapReader : MonoBehaviour {
 			}
 		}
 	}
-	
+
+	void Start() {
+		
+		SpriteRenderer renderer = GetComponent<SpriteRenderer> ();
+		if (renderer != null) {
+			Texture2D newTex = (Texture2D)GameObject.Instantiate(MapTexture);
+			renderer.sprite = Sprite.Create(newTex, renderer.sprite.rect, new Vector2(0.5f, 0.5f));
+		}
+	}
+
 	// Update is called once per frame
 	void Update () {
 		
@@ -163,6 +178,7 @@ public class MapReader : MonoBehaviour {
 			while (x != x1) {
 				m_Bitmap [x, y] = false;
 				m_DrawTexture.SetPixel ((int)x, (int)y, Color.black);
+				m_ColoredWallTexture.SetPixel ((int)x, (int)y, Color.yellow);
 						
 				err -= dy;
 				if (err < 0) {
@@ -178,6 +194,7 @@ public class MapReader : MonoBehaviour {
 			while (y != y1) {
 				m_Bitmap [x, y] = false;
 				m_DrawTexture.SetPixel ((int)x, (int)y, Color.black);
+				m_ColoredWallTexture.SetPixel ((int)x, (int)y, Color.yellow);
 				err -= dx;
 				if (err < 0) {
 					x += sx;
@@ -189,11 +206,13 @@ public class MapReader : MonoBehaviour {
 
 		m_Bitmap [x1, y1] = false;
 		m_DrawTexture.SetPixel ((int)x1, (int)y1, Color.black);
+		m_ColoredWallTexture.SetPixel ((int)x1, (int)y1, Color.yellow);
 	}
 
 	void PushWallPixels()
 	{
-		m_DrawTexture.Apply ();
+		m_DrawTexture.Apply();
+		m_ColoredWallTexture.Apply();
 	}
 }
 
