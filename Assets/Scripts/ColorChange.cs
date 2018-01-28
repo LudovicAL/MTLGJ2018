@@ -23,7 +23,7 @@ public class ColorChange : MonoBehaviour
 	float m_ZombieConversionRange = 0.05f;
     public int CountOfInfected;
     public int StartingCivilians = 3000;
-    public int CountOfCivilians;
+    public int CountOfCivilians ;
 
     public AudioClip Afraid;
     public AudioClip Moans;
@@ -40,7 +40,7 @@ public class ColorChange : MonoBehaviour
         float yAxis = Civilian.position.y;
         float xAxis = Civilian.position.x;
         m_GridOffset = -1.0f * new Vector3((m_GridWidth * 0.5f * m_GridCellWidthHeight), (m_GridHeight * 0.5f * m_GridCellWidthHeight), 0.0f);
-
+        CountOfCivilians = StartingCivilians;
         if (GameObject.Find("Map") != null)
         {
             g_MapReader = GameObject.Find("Map").GetComponent<MapReader>();
