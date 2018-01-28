@@ -207,12 +207,12 @@ public class MapReader : MonoBehaviour {
 		int[] pixelCoords = ConvertWorldCoordToPixelCoord (bloodSplatCoord[0], bloodSplatCoord[1]);
 
 		if (pixelCoords[0] < 0 || pixelCoords[0] >= m_Width)
-			return false;
+			return;
 
 		if (pixelCoords[1] < 0 || pixelCoords[1] >= m_Height)
-			return false;
+			return;
 
-		m_CityTexture.SetPixel(pixelCoords[0], pixelCoords[1]], Color.red);
+		m_CityTexture.SetPixel(pixelCoords[0], pixelCoords[1], Color.red);
 
 		for (int i = 0; i < 20; ++i)
 		{
