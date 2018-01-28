@@ -186,8 +186,8 @@ public class ColorChange : MonoBehaviour
             }
             else
             {
-                Green = ActiveSprite.color.g + InfectionRate * Time.deltaTime;
-                Red = ActiveSprite.color.r - InfectionRate * Time.deltaTime;
+				Green = ActiveSprite.color.g + InfectionRate * m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost * Time.deltaTime;
+				Red = ActiveSprite.color.r - InfectionRate * m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost * Time.deltaTime;
             }
 
             if (Blue <= BlueTarget)
@@ -363,9 +363,9 @@ public class ColorChange : MonoBehaviour
         return false;
     }
 
-    int m_GridWidth = 9;
-    int m_GridHeight = 7;
-    float m_GridCellWidthHeight = 1f;
+    int m_GridWidth = 18;
+    int m_GridHeight = 14;
+    float m_GridCellWidthHeight = 0.5f;
     Vector3 m_GridOffset;
 
     List<List<GameObject>> GameObjectGridList = new List<List<GameObject>>();
