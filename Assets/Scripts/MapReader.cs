@@ -13,9 +13,6 @@ public class MapReader : MonoBehaviour {
 	private Texture2D m_ColoredWallTexture;
 
 	void Awake() {
-		//string filePath = Application.dataPath + "/Arts/ProtoCity_01.png";
-		//Texture2D tex = LoadPNG (filePath);
-		//Texture2D tex = Resources.Load ("Maps/ProtoCity_01.png", typeof(Texture2D));
 
 		if (MapTexture == null) {
 			Debug.Log ("Could not find texture, will not load map.");
@@ -48,7 +45,16 @@ public class MapReader : MonoBehaviour {
 			}
 		}
 	}
-	
+
+	void Start() {
+		
+		SpriteRenderer renderer = GetComponent<SpriteRenderer> ();
+		if (renderer != null) {
+			Texture2D newTex = (Texture2D)GameObject.Instantiate(MapTexture);
+			renderer.sprite = Sprite.Create(newTex, renderer.sprite.rect, new Vector2(0.5f, 0.5f));
+		}
+	}
+
 	// Update is called once per frame
 	void Update () {
 		
