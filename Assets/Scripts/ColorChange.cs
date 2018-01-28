@@ -6,9 +6,6 @@ using System;
 
 public class ColorChange : MonoBehaviour
 {
-
-    //I love you Christ
-
     List<Vector2> GridList = new List<Vector2>();
     Color CurrentColor;
     Color NewColor;
@@ -18,18 +15,21 @@ public class ColorChange : MonoBehaviour
     float CivilianBaseSpeed = .1f;
 	float CivilianSpeedPlusMinus = .1f;
     public Transform Civilian;
+    public AudioClip Afraid;
+    public AudioClip Moans;
+    private AudioSource Source;
     private MapReader g_MapReader;
 	bool m_HasMapReader = false;
+    int m_NumberOfZombies = 1;
 
 	int m_MaxNumberOfInfectedToUpdateEachFrame = 100;
 	int m_InfectedIndex = 0;
 	int m_InfectedUpdatedThisFrame = 0;
 
-	//SOURCE TREE SUCKS MY BALLS
-
     // Use this for initialization
     void Start()
     {
+        Time.fixedDeltaTime = 30f * Time.timeScale;
         float yAxis = Civilian.position.y;
         float xAxis = Civilian.position.x;
         m_GridOffset = -1.0f * new Vector3((m_GridWidth * 0.5f * m_GridCellWidthHeight), (m_GridHeight * 0.5f * m_GridCellWidthHeight), 0.0f);
@@ -40,7 +40,7 @@ public class ColorChange : MonoBehaviour
 			m_HasMapReader = true;
         }
 
-        for (int i = 0; i < 3000; i++)
+        for (int i = 0; i < 2000; i++)
         {
             if (g_MapReader != null)
             { // valid map spawn
@@ -48,17 +48,15 @@ public class ColorChange : MonoBehaviour
                 xAxis = randomSpawnPos[0];
                 yAxis = randomSpawnPos[1];
             }
-            else
-            { // test spawn
-                xAxis += 2;
-                if (xAxis >= 35)
-                {
-                    xAxis = Civilian.position.x;
-                    yAxis += 2;
-                }
-            }
-
-
+            //else
+            //{ // test spawn
+            //    xAxis += 2;
+            //    if (xAxis >= 35)
+            //    {
+            //        xAxis = Civilian.position.x;
+            //        yAxis += 2;
+            //    }
+            //}
 
             Transform newCivilian = Instantiate(Civilian, new Vector3(xAxis, yAxis, 0), Quaternion.identity);
             newCivilian.tag = "Civilian";
@@ -67,7 +65,7 @@ public class ColorChange : MonoBehaviour
 
         BuildInitialListOfCivilians();
         SetupGameObjectGridList();
-        InitialInfect();
+        InitialInfection();
 
     }
 
@@ -83,6 +81,13 @@ public class ColorChange : MonoBehaviour
         {
             switch (m_Civilians[i].tag)
             {
+                case "Eating":
+                    ZombieDecay(m_Civilians[i], -0.025f);
+                    if (!IsHungry(m_Civilians[i]))
+                    {
+                        m_Civilians[i].tag = "Infected";
+                    }
+                    break;
                 case "Dead":
 
                     break;
@@ -90,21 +95,21 @@ public class ColorChange : MonoBehaviour
                 case "Civilian":
 					MoveRandomly(m_Civilians[i]);
                     break;
-			case "Infected":
-				ZombieDecay (m_Civilians [i]);
+			    case "Infected":
+				    ZombieDecay (m_Civilians [i], 0.025f);
 
-				if (i > m_InfectedIndex && m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) 
-				{
-					++m_InfectedUpdatedThisFrame;
-					m_InfectedIndex = i;
-					GetClosestCivilian(m_Civilians[i], i);
-				}
+				    if (i > m_InfectedIndex && m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) 
+				    {
+					    ++m_InfectedUpdatedThisFrame;
+					    m_InfectedIndex = i;
+					    GetClosestCivilian(m_Civilians[i], i);
+				    }
 					
                     if (IsHungry(m_Civilians[i]))
                     {
-						if (m_InfectedTargets[i] != null)
+					    if (m_InfectedTargets[i] != null)
                         {
-							RushCivilian(m_Civilians[i], m_InfectedTargets[i]);
+						    RushCivilian(m_Civilians[i], m_InfectedTargets[i]);
                         }
                         else
                         {
@@ -123,20 +128,20 @@ public class ColorChange : MonoBehaviour
 
     }
 
-    void ZombieDecay(GameObject ActiveInfected)
+    void ZombieDecay(GameObject ActiveInfected, float DecayRate)
     {
         SpriteRenderer ActiveSprite;
         ActiveSprite = ActiveInfected.transform.GetComponent<SpriteRenderer>();
         float RegTarget = 0.5f;
         float BlueTarget = .01f;
         float InfectionRate = .04f;
-        float DecayRate = .025f;
-
         Red = ActiveSprite.color.r;
         Blue = ActiveSprite.color.b;
 
         if (ActiveSprite.color.g <= 0.0f)
         {
+            Color ActiveSpriteColor = ActiveSprite.color;
+            ActiveSprite.color = new Color(0.0f, 0.0f, 0.0f, 0.40f);
             ActiveInfected.tag = "Dead";
         }
         else
@@ -159,7 +164,6 @@ public class ColorChange : MonoBehaviour
             }
             else
             {
-
                 Blue = Math.Max(.001f, ActiveSprite.color.b - InfectionRate * Time.deltaTime);
             }
 
@@ -180,7 +184,7 @@ public class ColorChange : MonoBehaviour
 
         foreach (var obj in GameObjectGridList[m_CivilianGridIndex[i]])
         {
-            if (obj.tag != "Infected")
+            if (obj.tag == "Civilian")
             {
                 float TargetDist = Vector3.Distance(currentPosition, obj.transform.position);
                 if (TargetDist < ClosestDist)
@@ -201,48 +205,53 @@ public class ColorChange : MonoBehaviour
 		
         Vector3 targetPosition = Target.transform.position;
 
-        if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= .1f)
+        if (ActiveInfected.tag != "Eating")
         {
-            Target.tag = "Infected";
-        }
-        else
-        {
-			Vector3 newDirection = Vector3.Normalize(targetPosition - ActiveInfected.transform.position);
-			Vector3 newDestination = ActiveInfected.transform.position + (newDirection * InfectedBaseSpeed * Time.deltaTime);
+            if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= .1f)
+            {
+                ActiveInfected.tag = "Eating";
+                Target.tag = "Infected";
+            }
+            else
+            {
+                Vector3 newDirection = Vector3.Normalize(targetPosition - ActiveInfected.transform.position);
+                Vector3 newDestination = ActiveInfected.transform.position + (newDirection * InfectedBaseSpeed * Time.deltaTime);
 
-			if (CanMove (newDestination)) 
-			{
-				ActiveInfected.transform.position = newDestination;
-			} 
-			else 
-			{
-				Vector3 newDestinationX = ActiveInfected.transform.position + (new Vector3(newDirection.x, 0.0f, 0.0f) * InfectedBaseSpeed * Time.deltaTime);
-				Vector3 newDestinationY = ActiveInfected.transform.position + (new Vector3(0.0f, newDirection.y, 0.0f) * InfectedBaseSpeed * Time.deltaTime);
+                if (CanMove(newDestination))
+                {
+                    ActiveInfected.transform.position = newDestination;
+                }
+                else
+                {
+                    Vector3 newDestinationX = ActiveInfected.transform.position + (new Vector3(newDirection.x, 0.0f, 0.0f) * InfectedBaseSpeed * Time.deltaTime);
+                    Vector3 newDestinationY = ActiveInfected.transform.position + (new Vector3(0.0f, newDirection.y, 0.0f) * InfectedBaseSpeed * Time.deltaTime);
 
-				if (newDirection.x > newDirection.y) 
-				{
-					if (CanMove (newDestinationX)) 
-					{
-						ActiveInfected.transform.position = newDestinationX;
-					} 
-					else if (CanMove (newDestinationY)) 
-					{
-						ActiveInfected.transform.position = newDestinationY;
-					}
-				} 
-				else 
-				{
-					if (CanMove (newDestinationY)) 
-					{
-						ActiveInfected.transform.position = newDestinationY;
-					} 
-					else if (CanMove (newDestinationX)) 
-					{
-						ActiveInfected.transform.position = newDestinationX;
-					}
-				}
-			}	
+                    if (newDirection.x > newDirection.y)
+                    {
+                        if (CanMove(newDestinationX))
+                        {
+                            ActiveInfected.transform.position = newDestinationX;
+                        }
+                        else if (CanMove(newDestinationY))
+                        {
+                            ActiveInfected.transform.position = newDestinationY;
+                        }
+                    }
+                    else
+                    {
+                        if (CanMove(newDestinationY))
+                        {
+                            ActiveInfected.transform.position = newDestinationY;
+                        }
+                        else if (CanMove(newDestinationX))
+                        {
+                            ActiveInfected.transform.position = newDestinationX;
+                        }
+                    }
+                }
+            }
         }
+        
     }
 
     void MoveRandomly(GameObject ActiveInfected)
@@ -380,13 +389,26 @@ public class ColorChange : MonoBehaviour
 	}
 
 
-    void InitialInfect()
+    void InitialInfection()
     {
-
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Civilian");
-        int index = objects.Length;
-        int randomCivilian = UnityEngine.Random.Range(0, index);
-        objects[randomCivilian].tag = "Infected";
+        for (int i = 1; i <= m_NumberOfZombies; ++i)
+        {
+            int index = objects.Length;
+            int randomCivilian = UnityEngine.Random.Range(0, index);
+            objects[randomCivilian].tag = "Infected";
+            SoundManager(objects[randomCivilian]);
+        }
+    }
 
+    void SoundManager(GameObject ActiveObject)
+    {
+        ActiveObject.AddComponent<AudioSource>();
+        Source = ActiveObject.GetComponent<AudioSource>();
+        Source.spatialBlend = 1;
+        Source.rolloffMode = AudioRolloffMode.Linear;
+        Source.minDistance = 9f;
+        Source.maxDistance = 11f;
+        Source.PlayOneShot(Afraid);
     }
 }

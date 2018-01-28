@@ -11,9 +11,6 @@ public class MapReader : MonoBehaviour {
 	public Texture2D MapTexture; 
 
 	void Awake() {
-		//string filePath = Application.dataPath + "/Arts/ProtoCity_01.png";
-		//Texture2D tex = LoadPNG (filePath);
-		//Texture2D tex = Resources.Load ("Maps/ProtoCity_01.png", typeof(Texture2D));
 
 		if (MapTexture == null) {
 			Debug.Log ("Could not find texture, will not load map.");
