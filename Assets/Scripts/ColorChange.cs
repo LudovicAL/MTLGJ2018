@@ -115,8 +115,20 @@ public class ColorChange : MonoBehaviour
 
 					    if (i > m_InfectedIndex && m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) 
 					    {
+							bool diedInWall = false;
+							Vector3 infectedPos = m_Civilians [i].transform.position;
+							if (!CanMove(infectedPos))
+							{
+								ZombieDied (m_Civilians [i], m_Civilians [i].GetComponent<SpriteRenderer>());
+								diedInWall = true;
+							}
+
 						    ++m_InfectedUpdatedThisFrame;
 						    m_InfectedIndex = i;
+
+							if (diedInWall)
+								break;
+						
 						    GetClosestCivilian(m_Civilians[i], i);
 					    }
 						
@@ -157,10 +169,7 @@ public class ColorChange : MonoBehaviour
 
         if (ActiveSprite.color.g <= 0.0f)
         {
-            Color ActiveSpriteColor = ActiveSprite.color;
-            ActiveSprite.color = new Color(0.0f, 0.0f, 0.0f, 0.40f);
-            ActiveInfected.tag = "Dead";
-            CountOfInfected -= 1;
+			ZombieDied (ActiveInfected, ActiveSprite);
         }
         else
         {
@@ -192,6 +201,14 @@ public class ColorChange : MonoBehaviour
         }
 		m_HumanHealthIndex [humanIndex] = ActiveSprite.color.r * 2.0f; //Hooray hacks!
     }
+
+	void ZombieDied(GameObject DyingInfected, SpriteRenderer ZombieRenderer)
+	{
+		Color ActiveSpriteColor = ZombieRenderer.color;
+		ZombieRenderer.color = new Color(0.0f, 0.0f, 0.0f, 0.40f);
+		DyingInfected.tag = "Dead";
+		CountOfInfected -= 1;
+	}
 
     void GetClosestCivilian(GameObject ActiveInfected, int i)
     {
