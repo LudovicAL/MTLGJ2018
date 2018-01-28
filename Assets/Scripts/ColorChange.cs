@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-
 public class ColorChange : MonoBehaviour
 {
+	public List<DifficultyParameters> m_DifficultyParameters;
+	public int m_DifficultyCurrentLevel = 0;
 
     //I love you Christ
 	private GameStatesManager gameStatesManager;
@@ -14,38 +15,26 @@ public class ColorChange : MonoBehaviour
     Color CurrentColor;
     Color NewColor;
     float Red, Blue, Green;
-    float InfectedBaseSpeed = .5f;
-	float InfectedSpeedPlusMinus = .2f;
-    float CivilianBaseSpeed = .1f;
-	float CivilianSpeedPlusMinus = .05f;
+
     public Transform Civilian;
     private MapReader g_MapReader;
 	bool m_HasMapReader = false;
-	float m_ZombieConversionRange = 0.05f;
+
     public int CountOfInfected;
-    int StartingCivilians = 3000;
     public int CountOfCivilians ;
 
     public AudioClip Afraid;
     public AudioClip Moans;
     private AudioSource Source;
-    int m_NumberOfZombies = 2;
 
     int m_MaxNumberOfInfectedToUpdateEachFrame = 100;
 	int m_InfectedIndex = 0;
 	int m_InfectedUpdatedThisFrame = 0;
 
-	//Makes the initial spread faster
-	float m_StartingZombieBoost = 2.0f;
-	float m_CurrentZombieBoost = 0.0f;
-	float m_ZombieBoostDegradeAmountPerNewZombie = 0.05f;
-
-    float m_BaseEatingSpeed = .05f;
-
     // Use this for initialization
     void Start()
     {
-		m_CurrentZombieBoost = m_StartingZombieBoost;
+		m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost = m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingZombieBoost;
 		gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
 		gameStatesManager.MenuGameState.AddListener(OnMenu);
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
@@ -56,14 +45,14 @@ public class ColorChange : MonoBehaviour
         float yAxis = Civilian.position.y;
         float xAxis = Civilian.position.x;
         m_GridOffset = -1.0f * new Vector3((m_GridWidth * 0.5f * m_GridCellWidthHeight), (m_GridHeight * 0.5f * m_GridCellWidthHeight), 0.0f);
-        CountOfCivilians = StartingCivilians;
+		CountOfCivilians = m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingHumans;
         if (GameObject.Find("Map") != null)
         {
             g_MapReader = GameObject.Find("Map").GetComponent<MapReader>();
 			m_HasMapReader = true;
         }
 
-        for (int i = 0; i < StartingCivilians; i++)
+		for (int i = 0; i < m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingHumans; i++)
         {
             if (g_MapReader != null)
             { // valid map spawn
@@ -108,7 +97,7 @@ public class ColorChange : MonoBehaviour
 	            switch (m_Civilians[i].tag)
 	            {
 	                case "Eating":
-						ZombieDecay(m_Civilians[i],i, -m_BaseEatingSpeed * m_CurrentZombieBoost);
+						ZombieDecay(m_Civilians[i],i, -m_DifficultyParameters[m_DifficultyCurrentLevel].m_BaseEatingSpeed * m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost);
 	                    if (!IsHungry(m_Civilians[i]))
 	                    {
 	                        m_Civilians[i].tag = "Infected";
@@ -235,22 +224,22 @@ public class ColorChange : MonoBehaviour
 		
         Vector3 targetPosition = Target.transform.position;
 
-		if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= m_ZombieConversionRange)
+		if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= m_DifficultyParameters[m_DifficultyCurrentLevel].m_ZombieConversionRange)
         {
 			if (Target.tag != "Infected") {
                 ActiveInfected.tag = "Eating";
                 Target.tag = "Infected";
                 CountOfInfected += 1;
                 CountOfCivilians -= 1;
-                m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (InfectedBaseSpeed - InfectedSpeedPlusMinus, InfectedBaseSpeed + InfectedSpeedPlusMinus); 
+				m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed - m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus, m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed + m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus); 
 				//GameObject.Instantiate (m_BloodSplat).transform.position = Target.transform.position;
 				//Do this in the texture. AURELIE! HERE! <3
 
-				if (m_CurrentZombieBoost > 1.0f) {
-					m_CurrentZombieBoost -= m_ZombieBoostDegradeAmountPerNewZombie;
-					if (m_CurrentZombieBoost < 1.0f) 
+				if (m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost > 1.0f) {
+					m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost -= m_DifficultyParameters[m_DifficultyCurrentLevel].m_ZombieBoostDegradeAmountPerNewZombie;
+					if (m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost < 1.0f) 
 					{
-						m_CurrentZombieBoost = 1.0f;
+						m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost = 1.0f;
 					}
 				} 
 
@@ -259,7 +248,7 @@ public class ColorChange : MonoBehaviour
         else
         {
 			Vector3 newDirection = Vector3.Normalize(targetPosition - ActiveInfected.transform.position);
-			Vector3 newDestination = ActiveInfected.transform.position + (newDirection * InfectedBaseSpeed * Time.deltaTime);
+			Vector3 newDestination = ActiveInfected.transform.position + (newDirection * m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed * Time.deltaTime);
 
 			if (CanMove (newDestination)) 
 			{
@@ -267,8 +256,8 @@ public class ColorChange : MonoBehaviour
 			} 
 			else 
 			{
-				Vector3 newDestinationX = ActiveInfected.transform.position + (new Vector3(newDirection.x, 0.0f, 0.0f) * m_CurrentZombieBoost * Time.deltaTime);
-				Vector3 newDestinationY = ActiveInfected.transform.position + (new Vector3(0.0f, newDirection.y, 0.0f) * m_CurrentZombieBoost * Time.deltaTime);
+				Vector3 newDestinationX = ActiveInfected.transform.position + (new Vector3(newDirection.x, 0.0f, 0.0f) * m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost * Time.deltaTime);
+				Vector3 newDestinationY = ActiveInfected.transform.position + (new Vector3(0.0f, newDirection.y, 0.0f) * m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost * Time.deltaTime);
 
 				if (newDirection.x > newDirection.y) 
 				{
@@ -312,7 +301,7 @@ public class ColorChange : MonoBehaviour
 		Vector3 newDestination;
 		if (ActiveHuman.tag == "Infected") 
 		{
-			newDestination = ActiveHuman.transform.position + (m_HumanSpeeds [humanIndex] * m_HumanHeadings [humanIndex] * m_HumanHealthIndex [humanIndex] * m_StartingZombieBoost * Time.deltaTime);
+			newDestination = ActiveHuman.transform.position + (m_HumanSpeeds [humanIndex] * m_HumanHeadings [humanIndex] * m_HumanHealthIndex [humanIndex] * m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingZombieBoost * Time.deltaTime);
 		} 
 		else 
 		{
@@ -368,7 +357,7 @@ public class ColorChange : MonoBehaviour
         for (int i = 0; i < amountOfCivilians; ++i)
         {
             m_CivilianGridIndex[i] = 0;
-			m_HumanSpeeds[i] = UnityEngine.Random.Range(CivilianBaseSpeed - CivilianSpeedPlusMinus, CivilianBaseSpeed + CivilianSpeedPlusMinus);
+			m_HumanSpeeds[i] = UnityEngine.Random.Range(m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianBaseSpeed - m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianSpeedPlusMinus, m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianBaseSpeed + m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianSpeedPlusMinus);
 			m_HumanHeadings[i].x = UnityEngine.Random.Range(-1.0f, 1.0f);
 			m_HumanHeadings[i].y = UnityEngine.Random.Range(-1.0f, 1.0f);
 			m_HumanHeadings[i].z = 0.0f;
@@ -482,14 +471,14 @@ public class ColorChange : MonoBehaviour
     void InitialInfection()
     {
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Civilian");
-        for (int i = 1; i <= m_NumberOfZombies; ++i)
+		for (int i = 1; i <= m_DifficultyParameters[m_DifficultyCurrentLevel].m_NumberOfZombies; ++i)
         {
             int index = objects.Length;
             int randomCivilian = UnityEngine.Random.Range(0, index);
             objects[randomCivilian].tag = "Infected";
             SoundManager(objects[randomCivilian]);
         }
-        CountOfInfected += m_NumberOfZombies;
+		CountOfInfected += m_DifficultyParameters[m_DifficultyCurrentLevel].m_NumberOfZombies;
     }
 
     void SoundManager(GameObject ActiveObject)
