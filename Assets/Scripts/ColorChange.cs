@@ -35,6 +35,13 @@ public class ColorChange : MonoBehaviour
     int m_InitialActiveZombies;
     public bool m_InitialInfectionDone;
 
+	private Text m_InfectedCountText;
+
+	void Awake()
+	{
+		m_InfectedCountText = GameObject.Find ("CurrentInfected").GetComponent<Text> ();
+	}
+
     // Use this for initialization
     void Start()
     {
@@ -82,6 +89,7 @@ public class ColorChange : MonoBehaviour
     {
 		if (gameState == StaticData.AvailableGameStates.Playing) {
             if (!m_InitialInfectionDone) { InitialInfection(); }
+
 			DrawDebugGrid();
 	        UpdateCivilianGameObjectLists();
 			m_InfectedUpdatedThisFrame = 0;
@@ -146,6 +154,8 @@ public class ColorChange : MonoBehaviour
 
 			if (m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) {
 				m_InfectedIndex = 0;
+				g_MapReader.PushBloodPixels ();
+				m_InfectedCountText.text= CountOfInfected + " Infected";
 			}
 		}
     }
@@ -244,7 +254,14 @@ public class ColorChange : MonoBehaviour
                 CountOfInfected += 1;
                 CountOfCivilians -= 1;
 
-                GameObject.Find("CurrentInfected").GetComponent<Text>().text= CountOfInfected + " Infected";
+				//Register zombie for panic
+				int gridX = GetGridXCoordinateFromWorldPosition (Target.transform.position.x);
+				int gridY = GetGridYCoordinateFromWorldPosition (Target.transform.position.y);
+
+				SetGridsWithZombies (gridX, gridY);
+
+				//g_MapReader.AddBloodSplat (Target.transform.position, 6, 20);
+				g_MapReader.AddBloodSplat (Target.transform.position, 3, 10);
 
                 m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed - m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus, m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed + m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus); 
 				//GameObject.Instantiate (m_BloodSplat).transform.position = Target.transform.position;
@@ -305,7 +322,7 @@ public class ColorChange : MonoBehaviour
 		float terrorModifier = 1.0f;
 		if (ActiveHuman.tag != "Infected" && m_GridsWithZombies [m_CivilianGridIndex[humanIndex]]) 
 		{
-			terrorModifier = 0.25f * (float)CountOfInfected;
+			terrorModifier = 0.02f * (float)CountOfInfected;
 
 			if (terrorModifier > 4.0f) 
 			{
@@ -422,25 +439,31 @@ public class ColorChange : MonoBehaviour
                 GameObjectGridList[newCivilianGridIndex].Add(m_Civilians[i]);
 				if (m_Civilians[i].tag == "Infected")
 				{
-					m_GridsWithZombies [newCivilianGridIndex] = true;
-					if (gridX < m_GridWidth - 1) {
-						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX + 1,gridY)] = true;
-					}
-					if (gridX > 0) {
-						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX - 1,gridY)] = true;
-					}
-					if (gridY < m_GridHeight - 1) {
-						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY + 1)] = true;
-					}
-					if (gridY > 0) {
-						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY - 1)] = true;
-					}
+					SetGridsWithZombies (gridX, gridY);
 				}
 
                 m_CivilianGridIndex[i] = newCivilianGridIndex;
             }
         }
     }
+
+	void SetGridsWithZombies(int gridX, int gridY)
+	{
+		m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY)] = true;
+
+		if (gridX < m_GridWidth - 1) {
+			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX + 1,gridY)] = true;
+		}
+		if (gridX > 0) {
+			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX - 1,gridY)] = true;
+		}
+		if (gridY < m_GridHeight - 1) {
+			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY + 1)] = true;
+		}
+		if (gridY > 0) {
+			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY - 1)] = true;
+		}
+	}
 
     void Test_DrawCivilianGameObjectListDebugLinesStaggered()
     {
@@ -496,10 +519,10 @@ public class ColorChange : MonoBehaviour
             SoundManager(objects[randomCivilian]);
 
             m_InitialActiveZombies += 1;
+			CountOfInfected += m_InitialActiveZombies;
             m_TimeBeforeSpawn += UnityEngine.Random.Range(2, 5);
 
-            CountOfInfected += m_InitialActiveZombies;
-            GameObject.Find("CurrentInfected").GetComponent<Text>().text = CountOfInfected + " Infected";
+			m_InfectedCountText.text = CountOfInfected + " Infected";
             if (m_InitialActiveZombies == m_DifficultyParameters[m_DifficultyCurrentLevel].m_NumberOfZombies) { m_InitialInfectionDone = true; }
         }
         
