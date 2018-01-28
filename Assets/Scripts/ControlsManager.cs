@@ -86,7 +86,7 @@ public class ControlsManager : MonoBehaviour {
 			if (Input.GetMouseButton(0)) {
 				if (!(EventSystem.current.IsPointerOverGameObject())) {
 					if (Input.GetMouseButtonDown(0)) {
-						poiterInitialPosition = Input.mousePosition;
+						poiterInitialPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 					}
 					MoveScreenMagically(Camera.main.ScreenToWorldPoint (Input.mousePosition));
 				}
@@ -167,12 +167,10 @@ public class ControlsManager : MonoBehaviour {
 		cameraTransform.Translate(vecDir * Time.deltaTime * cameraSpeed);
 	}
 
-
 	public void MoveScreenMagically(Vector3 fingerPosition) {
 		Vector3 direction = fingerPosition - poiterInitialPosition;
-		Vector3 newPosition = Camera.main.ScreenToWorldPoint (direction);
-		newPosition.z = Camera.main.transform.position.z;
-		Camera.main.transform.position = newPosition;
+		direction.z = Camera.main.transform.position.z;
+		Camera.main.transform.position = direction;
 	}
 
 	//Player asked to move the screen in the current frame
