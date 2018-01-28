@@ -18,6 +18,8 @@ public class ColorChange : MonoBehaviour
     public Transform Civilian;
     private MapReader g_MapReader;
 
+	//SOURCE TREE SUCKS MY BALLS
+
     // Use this for initialization
     void Start()
     {
