@@ -14,12 +14,13 @@ public class ColorChange : MonoBehaviour
     Color NewColor;
     float Red, Blue, Green;
     float InfectedBaseSpeed = .5f;
-	float InfectedSpeedPlusMinus = .5f;
+	float InfectedSpeedPlusMinus = .2f;
     float CivilianBaseSpeed = .1f;
-	float CivilianSpeedPlusMinus = .1f;
+	float CivilianSpeedPlusMinus = .05f;
     public Transform Civilian;
     private MapReader g_MapReader;
 	bool m_HasMapReader = false;
+	float m_ZombieConversionRange = 0.05f;
 
 	int m_MaxNumberOfInfectedToUpdateEachFrame = 100;
 	int m_InfectedIndex = 0;
@@ -88,7 +89,7 @@ public class ColorChange : MonoBehaviour
                     break;
 					
                 case "Civilian":
-					MoveRandomly(m_Civilians[i]);
+					MoveHumanRandomly(m_Civilians[i], i, 0.3f);
                     break;
 			case "Infected":
 				ZombieDecay (m_Civilians [i]);
@@ -104,11 +105,11 @@ public class ColorChange : MonoBehaviour
                     {
 						if (m_InfectedTargets[i] != null)
                         {
-							RushCivilian(m_Civilians[i], m_InfectedTargets[i]);
+							RushCivilian(m_Civilians[i], m_InfectedTargets[i], i);
                         }
                         else
                         {
-                            MoveRandomly(m_Civilians[i]);
+						MoveHumanRandomly(m_Civilians[i], i, 0.5f);
                         }
                     }
 
@@ -194,16 +195,17 @@ public class ColorChange : MonoBehaviour
 		m_InfectedTargets[i] = bestTarget;
     }
 
-    void RushCivilian(GameObject ActiveInfected, GameObject Target)
+	void RushCivilian(GameObject ActiveInfected, GameObject Target, int HumanIndex)
     {
 		if (Target == null)
 			return;
 		
         Vector3 targetPosition = Target.transform.position;
 
-        if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= .1f)
+		if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= m_ZombieConversionRange)
         {
             Target.tag = "Infected";
+			m_HumanSpeeds[HumanIndex] = UnityEngine.Random.Range(InfectedBaseSpeed - InfectedSpeedPlusMinus, InfectedBaseSpeed + InfectedSpeedPlusMinus); 
         }
         else
         {
@@ -245,18 +247,26 @@ public class ColorChange : MonoBehaviour
         }
     }
 
-    void MoveRandomly(GameObject ActiveInfected)
-    {
-
-		Vector3 newDestination =  Vector3.MoveTowards(
-			ActiveInfected.transform.position,
-			ActiveInfected.transform.position + new Vector3(UnityEngine.Random.Range(-1.0f, 1.0f), UnityEngine.Random.Range(-1.0f, 1.0f), 0.0f),
-			InfectedBaseSpeed * Time.deltaTime);
-		if (CanMove(newDestination))
-		{
-			ActiveInfected.transform.position = newDestination;
-		}   
-    }
+	void MoveHumanRandomly(GameObject ActiveHuman, int HumanIndex, float maxRandomGradualHeadingChange)
+	{
+		float terrorModifier = 1.0f;
+		if (ActiveHuman.tag != "Infected" && m_GridsWithZombies [m_CivilianGridIndex[HumanIndex]]) {
+			terrorModifier = 4.0f;
+		}
+		Vector3 newDestination = ActiveHuman.transform.position + (m_HumanSpeeds[HumanIndex] * m_HumanHeadings[HumanIndex] * terrorModifier * Time.deltaTime);
+		
+		if (CanMove (newDestination)) {
+			ActiveHuman.transform.position = newDestination;
+			Vector3 newGradualRandomHeadingchange = new Vector3 (UnityEngine.Random.Range (-maxRandomGradualHeadingChange, maxRandomGradualHeadingChange), UnityEngine.Random.Range (-maxRandomGradualHeadingChange, maxRandomGradualHeadingChange), 0.0f);
+			m_HumanHeadings [HumanIndex] = Vector3.Normalize (m_HumanHeadings [HumanIndex] + newGradualRandomHeadingchange);
+		} 
+		else {
+			m_HumanHeadings[HumanIndex].x = UnityEngine.Random.Range(-1.0f, 1.0f);
+			m_HumanHeadings[HumanIndex].y = UnityEngine.Random.Range(-1.0f, 1.0f);
+			m_HumanHeadings[HumanIndex].z = 0.0f;
+			m_HumanHeadings [HumanIndex] = Vector3.Normalize (m_HumanHeadings [HumanIndex]);
+		}
+	}
 
     bool IsHungry(GameObject ActiveInfected)
     {
@@ -277,6 +287,7 @@ public class ColorChange : MonoBehaviour
 	float[] m_HumanSpeeds;
 	Vector3[] m_HumanHeadings;
 	GameObject[] m_InfectedTargets;
+	bool[] m_GridsWithZombies;
 
     void BuildInitialListOfCivilians()
     {
@@ -291,19 +302,22 @@ public class ColorChange : MonoBehaviour
         for (int i = 0; i < amountOfCivilians; ++i)
         {
             m_CivilianGridIndex[i] = 0;
-			m_HumanSpeeds [i] = CivilianBaseSpeed;
-			m_HumanHeadings[i].x = 1.0f;
-			m_HumanHeadings[i].y = 1.0f;
+			m_HumanSpeeds[i] = UnityEngine.Random.Range(CivilianBaseSpeed - CivilianSpeedPlusMinus, CivilianBaseSpeed + CivilianSpeedPlusMinus);
+			m_HumanHeadings[i].x = UnityEngine.Random.Range(-1.0f, 1.0f);
+			m_HumanHeadings[i].y = UnityEngine.Random.Range(-1.0f, 1.0f);
 			m_HumanHeadings[i].z = 0.0f;
+			m_HumanHeadings [i] = Vector3.Normalize (m_HumanHeadings [i]);
 			m_InfectedTargets[i] = null;
         }
     }
 
     void SetupGameObjectGridList()
     {
+		m_GridsWithZombies = new bool[m_GridWidth * m_GridHeight];
         for (int i = 0; i < m_GridWidth * m_GridHeight; ++i)
         {
             GameObjectGridList.Add(new List<GameObject>());
+			m_GridsWithZombies [i] = false;
         }
     }
 
@@ -326,13 +340,31 @@ public class ColorChange : MonoBehaviour
         int amountOfCivilians = m_Civilians.Length;
         for (int i = 0; i < amountOfCivilians; ++i)
         {
-            int newCivilianGridIndex = GetIndexFromGridCoordinates(GetGridXCoordinateFromWorldPosition(m_Civilians[i].transform.position.x), GetGridYCoordinateFromWorldPosition(m_Civilians[i].transform.position.y));
+			int gridX = GetGridXCoordinateFromWorldPosition (m_Civilians [i].transform.position.x);
+			int gridY = GetGridYCoordinateFromWorldPosition (m_Civilians [i].transform.position.y);
+			int newCivilianGridIndex = GetIndexFromGridCoordinates(gridX,gridY);
             if (m_CivilianGridIndex[i] != newCivilianGridIndex)
             {
                 //Unregister civilian from old grid group
                 GameObjectGridList[m_CivilianGridIndex[i]].Remove(m_Civilians[i]);
                 //Register civilian to new grid group
                 GameObjectGridList[newCivilianGridIndex].Add(m_Civilians[i]);
+				if (m_Civilians[i].tag == "Infected")
+				{
+					m_GridsWithZombies [newCivilianGridIndex] = true;
+					if (gridX < m_GridWidth - 1) {
+						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX + 1,gridY)] = true;
+					}
+					if (gridX > 0) {
+						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX - 1,gridY)] = true;
+					}
+					if (gridY < m_GridHeight - 1) {
+						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY + 1)] = true;
+					}
+					if (gridY > 0) {
+						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY - 1)] = true;
+					}
+				}
 
                 m_CivilianGridIndex[i] = newCivilianGridIndex;
             }
