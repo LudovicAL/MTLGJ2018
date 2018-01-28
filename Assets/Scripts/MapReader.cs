@@ -45,6 +45,15 @@ public class MapReader : MonoBehaviour {
 				renderer.sprite = Sprite.Create (m_RuntimeColoredWallTexture, renderer.sprite.rect, new Vector2 (0.5f, 0.5f));
 			}
 		}
+
+		GameObject cityTexture = GameObject.Find ("Map");
+		if (cityTexture != null) {
+			SpriteRenderer renderer = cityTexture.GetComponent<SpriteRenderer> ();
+			if (renderer != null) {
+				m_CityTexture = (Texture2D)GameObject.Instantiate (renderer.sprite.texture);
+				renderer.sprite = Sprite.Create (m_CityTexture, renderer.sprite.rect, new Vector2 (0.5f, 0.5f));
+			}
+		}
 	}
 
 	// Update is called once per frame
