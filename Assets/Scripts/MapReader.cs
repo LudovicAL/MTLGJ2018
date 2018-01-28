@@ -9,6 +9,7 @@ public class MapReader : MonoBehaviour {
 	int m_Width;
 	int m_Height;
 	public Texture2D MapTexture; 
+	private Texture2D m_DrawTexture;
 
 	void Awake() {
 
@@ -16,6 +17,8 @@ public class MapReader : MonoBehaviour {
 			Debug.Log ("Could not find texture, will not load map.");
 			return;
 		}
+
+		m_DrawTexture = GameObject.Find ("Map").GetComponent<SpriteRenderer> ().sprite.texture;
 
 		m_Width = MapTexture.width;
 		m_Height = MapTexture.height;
@@ -50,18 +53,23 @@ public class MapReader : MonoBehaviour {
 
 	public bool CanMoveThere(float _xPos, float _yPos)
 	{
-		int pixelPosX = (int)((m_Width / 2.0f) + _xPos*100.0f);
-		int pixelPosY = (int)((m_Height / 2.0f) + _yPos*100.0f); 
+		int[] pixelCoords = ConvertWorldCoordToPixelCoord (_xPos, _yPos);
 
-		//Debug.Log ("Got " + _xPos + ", " + _yPos + " converted to pixels " + pixelPosX + ", " + pixelPosY);
-
-		if (pixelPosX < 0 || pixelPosX >= m_Width)
+		if (pixelCoords[0] < 0 || pixelCoords[0] >= m_Width)
 			return false;
 
-		if (pixelPosY < 0 || pixelPosY >= m_Height)
+		if (pixelCoords[1] < 0 || pixelCoords[1] >= m_Height)
 			return false;
 
-		return m_Bitmap[pixelPosX, pixelPosY];
+		return m_Bitmap[pixelCoords[0], pixelCoords[1]];
+	}
+
+	int[] ConvertWorldCoordToPixelCoord(float _xPos, float _yPos)
+	{
+		int[] result = new int[2];
+		result[0] = (int)((m_Width / 2.0f) + _xPos*100.0f);
+		result[1] = (int)((m_Height / 2.0f) + _yPos*100.0f); 
+		return result;
 	}
 
 	float[] ConvertPixelCoordToWorldCoord(int _pixelX, int _pixelY)
@@ -79,10 +87,117 @@ public class MapReader : MonoBehaviour {
 
 		if (File.Exists(_filePath))     {
 			fileData = File.ReadAllBytes(_filePath);
-			tex = new Texture2D(2, 2);
+			tex = new Texture2D(2, 2, TextureFormat.RGB24, false);
 			tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
 		}
 		return tex;
 	}
 
+	public void AddWall(List<Vector2> _wallCoords)
+	{
+		Debug.Log ("NEW WALL");
+		for (int i = 1; i < _wallCoords.Count; ++i) {
+			Vector2 wallCoordA = _wallCoords [i-1];
+			Vector2 wallCoordB = _wallCoords [i];
+
+			Vector2 directionVector = wallCoordB - wallCoordA;
+			Vector2 leftVector = new Vector2(-directionVector.y, directionVector.x);
+			leftVector.Normalize ();
+			Vector2 rightVector = new Vector2(directionVector.y, -directionVector.x);
+			rightVector.Normalize ();
+
+			QueueWallPixels (wallCoordA, wallCoordB);
+
+			for (int extraWallIndex = 0; extraWallIndex < 20; ++extraWallIndex)
+			{
+				float extraWallOffset = 0.0025f * (float)extraWallIndex;
+				QueueWallPixels (wallCoordA + (leftVector * extraWallOffset), wallCoordB + (leftVector * extraWallOffset));
+				QueueWallPixels (wallCoordA + (rightVector * extraWallOffset), wallCoordB + (rightVector * extraWallOffset));
+			}
+
+			PushWallPixels ();
+		}
+	}
+
+	public void QueueWallPixels(Vector2 wallCoordA, Vector2 wallCoordB)
+	{
+		int[] pixelCoordA = ConvertWorldCoordToPixelCoord (wallCoordA [0], wallCoordA [1]);
+		int[] pixelCoordB = ConvertWorldCoordToPixelCoord (wallCoordB [0], wallCoordB [1]);
+		QueueWallPixelsBetweenPoints_Bresenham (pixelCoordA, pixelCoordB);
+
+		//bool wasAWall = m_Bitmap [pixelCoord [0], pixelCoord [1]] == false;
+		//if (wasAWall) break into smaller walls
+		//m_Bitmap [pixelCoord [0], pixelCoord [1]] = false; // update unwalkable
+
+		//Debug.DrawLine(_wallCoords[i-1], _wallCoords[i]);
+		//Debug.Log ("wall coords: " + _wallCoords[i-1].ToString("F4") + ", " + _wallCoords[i].ToString("F4"));
+
+		//Debug.Log ("pixel coords: (" + pixelCoordA[0] + ", " + pixelCoordA[1] + "), (" + pixelCoordB[0] + ", " + pixelCoordB[1] + ")");
+
+<<<<<<< HEAD
+	}
+
+	void QueueWallPixelsBetweenPoints_Bresenham(int[] _startPixelCoord, int[] _endPixelCoord)
+	{
+=======
+		// clamp outside points
+		_startPixelCoord [0] = Mathf.Clamp (_startPixelCoord [0], 0, m_Width-1);
+		_startPixelCoord [1] = Mathf.Clamp (_startPixelCoord [1], 0, m_Height-1);
+		_endPixelCoord [0] = Mathf.Clamp (_endPixelCoord [0], 0, m_Width-1);
+		_endPixelCoord [1] = Mathf.Clamp (_endPixelCoord [1], 0, m_Height-1);
+
+>>>>>>> 91c3aca99860ea14a626210bfe273eda9a8f2186
+		float dx = Mathf.Abs (_endPixelCoord [0] - _startPixelCoord [0]);
+		float dy = Mathf.Abs (_endPixelCoord [1] - _startPixelCoord [1]);
+
+		int x0 = _startPixelCoord [0];
+		int y0 = _startPixelCoord [1];
+		int x1 = _endPixelCoord [0];
+		int y1 = _endPixelCoord [1];
+
+		int x = x0;
+		int y = y0;
+
+		int sx = x0 > x1 ? -1 : 1;
+		int sy = y0 > y1 ? -1 : 1;
+
+		if (dx > dy) { 
+			float err = dx / 2.0f;
+			while (x != x1) {
+				m_Bitmap [x, y] = false;
+				m_DrawTexture.SetPixel ((int)x, (int)y, Color.black);
+						
+				err -= dy;
+				if (err < 0) {
+					y += sy;
+					err += dx;
+				} 
+				x += sx;
+			}
+		}
+		else 
+		{
+			float err = dy / 2.0f;
+			while (y != y1) {
+				m_Bitmap [x, y] = false;
+				m_DrawTexture.SetPixel ((int)x, (int)y, Color.black);
+				err -= dx;
+				if (err < 0) {
+					x += sx;
+					err += dy;
+				}
+				y += sy;
+			}
+		}
+
+		m_Bitmap [x1, y1] = false;
+		m_DrawTexture.SetPixel ((int)x1, (int)y1, Color.black);
+	}
+
+	void PushWallPixels()
+	{
+		m_DrawTexture.Apply ();
+	}
 }
+
+
