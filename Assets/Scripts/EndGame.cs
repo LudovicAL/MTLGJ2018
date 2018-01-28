@@ -67,6 +67,8 @@ public class EndGame : MonoBehaviour {
     void Update()
     {
 		if (gameState == StaticData.AvailableGameStates.Playing) {
+            print(colorChange.CountOfInfected);
+            print(colorChange.CountOfCivilians);
             if (colorChange.CountOfInfected == 0 || colorChange.CountOfCivilians == 0)
             //if (colorChange.CountOfInfected >= 5)
             {	
