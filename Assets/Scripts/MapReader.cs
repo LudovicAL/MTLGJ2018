@@ -201,6 +201,35 @@ public class MapReader : MonoBehaviour {
 	{
 		m_RuntimeColoredWallTexture.Apply();
 	}
+		
+	public void AddBloodSplat(Vector3 bloodSplatCoord, int bloodSplatRadius)
+	{
+		int[] pixelCoords = ConvertWorldCoordToPixelCoord (bloodSplatCoord[0], bloodSplatCoord[1]);
+
+		if (pixelCoords[0] < 0 || pixelCoords[0] >= m_Width)
+			return false;
+
+		if (pixelCoords[1] < 0 || pixelCoords[1] >= m_Height)
+			return false;
+
+		m_CityTexture.SetPixel(pixelCoords[0], pixelCoords[1]], Color.red);
+
+		for (int i = 0; i < 20; ++i)
+		{
+			int newX = pixelCoords[0] + Random.Range(-bloodSplatRadius, bloodSplatRadius);	
+			int newY = pixelCoords[1] + Random.Range(-bloodSplatRadius, bloodSplatRadius);	
+
+			if (newX >= 0 && newX < m_Width && newY >= 0 || newY < m_Height)
+			{
+				m_CityTexture.SetPixel(newX, newY, Color.red);
+			}
+		}
+	}
+
+	public void PushBloodPixels()
+	{
+		m_CityTexture.Apply();
+	}
 }
 
 

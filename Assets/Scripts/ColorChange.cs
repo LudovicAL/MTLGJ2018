@@ -151,6 +151,7 @@ public class ColorChange : MonoBehaviour
 
 			if (m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) {
 				m_InfectedIndex = 0;
+				g_MapReader.PushBloodPixels ();
 			}
 		}
     }
@@ -248,6 +249,8 @@ public class ColorChange : MonoBehaviour
                 Target.tag = "Infected";
                 CountOfInfected += 1;
                 CountOfCivilians -= 1;
+
+				g_MapReader.AddBloodSplat (Target.transform.position, 10);
 
                 GameObject.Find("CurrentInfected").GetComponent<Text>().text= CountOfInfected + " Infected";
 
