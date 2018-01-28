@@ -7,7 +7,6 @@ public class ColorChange : MonoBehaviour
 {
 	public List<DifficultyParameters> m_DifficultyParameters;
 	public int m_DifficultyCurrentLevel = 0;
-
     //I love you Christ
 	private GameStatesManager gameStatesManager;
 	private StaticData.AvailableGameStates gameState;
@@ -34,6 +33,7 @@ public class ColorChange : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+		Debug.Log ("Difficulty level: " + m_DifficultyCurrentLevel);
 		m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost = m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingZombieBoost;
 		gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
 		gameStatesManager.MenuGameState.AddListener(OnMenu);
