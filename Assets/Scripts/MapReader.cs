@@ -8,24 +8,26 @@ public class MapReader : MonoBehaviour {
 	List<int[]> m_WhiteSpots;
 	int m_Width;
 	int m_Height;
+	public Texture2D MapTexture; 
 
 	void Awake() {
-		string filePath = Application.dataPath + "/Arts/ProtoCity_01.png";
-		Texture2D tex = LoadPNG (filePath);
+		//string filePath = Application.dataPath + "/Arts/ProtoCity_01.png";
+		//Texture2D tex = LoadPNG (filePath);
+		//Texture2D tex = Resources.Load ("Maps/ProtoCity_01.png", typeof(Texture2D));
 
-		if (tex == null) {
+		if (MapTexture == null) {
 			Debug.Log ("Could not find texture, will not load map.");
 			return;
 		}
 
-		m_Width = tex.width;
-		m_Height = tex.height;
+		m_Width = MapTexture.width;
+		m_Height = MapTexture.height;
 		m_Bitmap = new bool[m_Width,m_Height];
 		m_WhiteSpots = new List<int[]>();
 
 		for (int i = 0; i < m_Width; ++i) {
 			for (int j = 0; j < m_Height; ++j) {
-				Color color = tex.GetPixel (i, j);
+				Color color = MapTexture.GetPixel (i, j);
 				bool isFreeSpot = color == Color.white;
 
 				m_Bitmap [i,j] = isFreeSpot ? true : false;
