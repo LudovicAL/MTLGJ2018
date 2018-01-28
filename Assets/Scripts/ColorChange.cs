@@ -225,10 +225,14 @@ public class ColorChange : MonoBehaviour
 
         int amountOfCivilians = m_Civilians.Length;
         m_CivilianGridIndex = new int[amountOfCivilians];
+		m_HumanSpeeds = new Vector3[amountOfCivilians];
+		m_HumanHeadings = new Vector3[amountOfCivilians];
 
         for (int i = 0; i < amountOfCivilians; ++i)
         {
             m_CivilianGridIndex[i] = 0;
+			int[i] = new Vector3;
+			m_HumanSpeeds[i] = new Vector3[amountOfCivilians];
         }
 
     }
