@@ -8,6 +8,8 @@ public class ControlsManager : MonoBehaviour {
 	//public float updateGap = 0.02f;
 	private Vector3 m_PreviousPointerPosition;
 	//private 
+	private Renderer mapRenderer;
+	private Transform mapTransform;
 	private float distanceBetweenFingers;
 	private LineRenderer hollowLine;
 	private LineRenderer m_BadLine;
@@ -25,6 +27,8 @@ public class ControlsManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		mapRenderer = GameObject.Find ("Map").GetComponent<Renderer>();
+		mapTransform = GameObject.Find ("Map").transform;
 		distanceBetweenFingers = 0.0f;
 		nextUpdateTime = 0.0f;
 		cameraTransform = Camera.main.transform;
@@ -173,8 +177,13 @@ public class ControlsManager : MonoBehaviour {
 		//Debug.Log ("inverted");
 		//Debug.Log (direction);
 
-		Camera.main.transform.position += direction;
+		Vector3 newPosition = Camera.main.transform.position + direction;
+		newPosition.z = mapTransform.position.z;
+		if (mapRenderer.bounds.Contains(newPosition)) {
+			Camera.main.transform.position += direction;
+		}
 		m_PreviousPointerPosition = fingerPosition;
+
 	}
 
 	//Player asked to move the screen in the current frame
