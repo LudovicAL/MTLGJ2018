@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 114693374265573168}
   - component: {fileID: 114990470629987104}
   - component: {fileID: 114294750957264182}
+  - component: {fileID: 114268906547379192}
   m_Layer: 0
   m_Name: Scriptsbucket
   m_TagString: Untagged
@@ -42,6 +43,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114268906547379192
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1798513221375364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1edab92d64bf21418ebe68c562580bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114294750957264182
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -53,9 +65,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 854eb949be4166548abb9498fc89a1a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_DifficultyParameters: []
   Civilian: {fileID: 0}
   CountOfInfected: 0
-  StartingCivilians: 3000
+  CountOfCivilians: 0
   Afraid: {fileID: 8300000, guid: 048035e85f78fc545986f210f9fda240, type: 3}
   Moans: {fileID: 8300000, guid: 28bb4ec7917e6724a9752abd41bbd105, type: 3}
 --- !u!114 &114693374265573168
@@ -72,28 +85,28 @@ MonoBehaviour:
   MenuGameState:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   StartingGameState:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   PausedGameState:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   PlayingGameState:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   EndingGameState:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!114 &114990470629987104
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -105,9 +118,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45e9ab635cb1786498eb7d0bb2328bd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallConstructionMode: 0
   cameraSpeed: 1
-  zoomSpeed: 3
-  updateGap: 0.02
-  fieldOfViewMin: 2
-  fieldOfViewMax: 20
