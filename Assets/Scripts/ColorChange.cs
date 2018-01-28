@@ -11,6 +11,7 @@ public class ColorChange : MonoBehaviour
     //I love you Christ
 	private GameStatesManager gameStatesManager;
 	private StaticData.AvailableGameStates gameState;
+	private MusicManager musicM;
     List<Vector2> GridList = new List<Vector2>();
     Color CurrentColor;
     Color NewColor;
@@ -46,6 +47,7 @@ public class ColorChange : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+			musicM = GameObject.Find("Scriptsbucket").GetComponent<MusicManager>();
             m_TimeBeforeSpawn = UnityEngine.Random.Range(2, 5);
             m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost = m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingZombieBoost;
             gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
@@ -531,6 +533,7 @@ public class ColorChange : MonoBehaviour
 
     void SoundManager(GameObject ActiveObject)
     {
+		musicM.PlayMusic ();
         ActiveObject.AddComponent<AudioSource>();
         Source = ActiveObject.GetComponent<AudioSource>();
         Source.spatialBlend = 1;
