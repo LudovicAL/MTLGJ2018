@@ -105,9 +105,9 @@ public class MapReader : MonoBehaviour {
 			//m_Bitmap [pixelCoord [0], pixelCoord [1]] = false; // update unwalkable
 
 			Debug.DrawLine(_wallCoords[i-1], _wallCoords[i]);
-			Debug.Log ("wall coords: " + _wallCoords[i-1].ToString("F4") + ", " + _wallCoords[i].ToString("F4"));
+			//Debug.Log ("wall coords: " + _wallCoords[i-1].ToString("F4") + ", " + _wallCoords[i].ToString("F4"));
 
-			Debug.Log ("pixel coords: (" + pixelCoordA[0] + ", " + pixelCoordA[1] + "), (" + pixelCoordB[0] + ", " + pixelCoordB[1] + ")");
+			//Debug.Log ("pixel coords: (" + pixelCoordA[0] + ", " + pixelCoordA[1] + "), (" + pixelCoordB[0] + ", " + pixelCoordB[1] + ")");
 			MakeWallBetweenPoints_Bresenham (pixelCoordA, pixelCoordB);
 		}
 	}
