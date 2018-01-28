@@ -108,10 +108,14 @@ public class CanvasManager : MonoBehaviour {
 	public void ShowEndScreen() {
 		
 		showPanel ("Panel End");
-		textCasualties.text = eg.m_NumberOfCasualties.ToString ();
+        Camera camera = Camera.main;
+        GameObject cameraPos = GameObject.Find("Main Camera");
+        cameraPos.transform.position = new Vector3(0, 0);
+        camera.orthographicSize = 3.5f;
+
+        textCasualties.text = eg.m_NumberOfCasualties.ToString ();
 		textSurvivors.text = eg.m_NumberOfCivilians.ToString ();
 		float ratio = eg.m_NumberOfCivilians / (eg.m_NumberOfCasualties + eg.m_NumberOfCivilians);
-		textRatio.text = ratio.ToString ("0.0%");
-		
-	}
+		textRatio.text = string.Format("{0:P2}.", ratio);
+    }
 }
