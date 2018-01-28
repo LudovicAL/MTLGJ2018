@@ -5,15 +5,18 @@ using System;
 
 public class EndGame : MonoBehaviour {
 
+    private ColorChange colorChange;
     private GameStatesManager gameStatesManager;
     private StaticData.AvailableGameStates gameState;
-    int m_NumberOfCivilians;
+    public int m_NumberOfCasualties;
+    public int m_NumberOfCivilians;
     int m_NumberOfInfected;
     int m_NumberOfDead;
     int m_NumberOfEating;
 
     void Start()
     {
+        colorChange = GameObject.Find("Scriptsbucket").GetComponent<ColorChange>();
         gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
         gameStatesManager.MenuGameState.AddListener(OnMenu);
         gameStatesManager.StartingGameState.AddListener(OnStarting);
@@ -45,6 +48,11 @@ public class EndGame : MonoBehaviour {
         SetState(StaticData.AvailableGameStates.Paused);
     }
 
+    protected void OnEnding()
+    {
+        SetState(StaticData.AvailableGameStates.Ending);
+    }
+
     private void SetState(StaticData.AvailableGameStates state)
     {
         gameState = state;
@@ -58,14 +66,19 @@ public class EndGame : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+
+        if (colorChange.CountOfInfected == 0 || colorChange.CountOfInfected == colorChange.StartingCivilians)
+        {
+            EndOfGame();
+        }
+    }
+
+    void EndOfGame()
+    {
+        m_NumberOfDead = GameObject.FindGameObjectsWithTag("Dead").Length;
         m_NumberOfCivilians = GameObject.FindGameObjectsWithTag("Civilian").Length;
         m_NumberOfInfected = GameObject.FindGameObjectsWithTag("Infected").Length;
-        m_NumberOfDead = GameObject.FindGameObjectsWithTag("Dead").Length;
-        m_NumberOfEating = GameObject.FindGameObjectsWithTag("Eating").Length;
-
-        if (m_NumberOfCivilians == 0 || m_NumberOfInfected == 0)
-        {
-            RequestGameStateChange();
-        }
+        m_NumberOfCasualties = m_NumberOfInfected + m_NumberOfDead;
+        RequestGameStateChange(StaticData.AvailableGameStates.Ending);
     }
 }

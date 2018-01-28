@@ -208,7 +208,6 @@ GameObject:
   - component: {fileID: 1114069168}
   - component: {fileID: 1114069169}
   - component: {fileID: 1114069170}
-  - component: {fileID: 1114069171}
   m_Layer: 0
   m_Name: Scriptsbucket
   m_TagString: Untagged
@@ -291,6 +290,11 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  EndingGameState:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!114 &1114069170
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -302,21 +306,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c46a2d1e1ccc0034eb40b3b2c4618c3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NumberOfCivilians: 0
-  NumberOfInfected: 0
-  NumberOfDead: 0
-  NumberOfEating: 0
---- !u!114 &1114069171
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1114069165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0609bb6afea9d06489bd5c560d44690f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_NumberOfCasualties: 0
+  m_NumberOfCivilians: 0
 --- !u!1 &1251596688
 GameObject:
   m_ObjectHideFlags: 0

@@ -21,6 +21,8 @@ public class ColorChange : MonoBehaviour
     private MapReader g_MapReader;
 	bool m_HasMapReader = false;
 	float m_ZombieConversionRange = 0.05f;
+    public int CountOfInfected;
+    public int StartingCivilians = 3000;
 
     public AudioClip Afraid;
     public AudioClip Moans;
@@ -44,7 +46,7 @@ public class ColorChange : MonoBehaviour
 			m_HasMapReader = true;
         }
 
-        for (int i = 0; i < 3000; i++)
+        for (int i = 0; i < StartingCivilians; i++)
         {
             if (g_MapReader != null)
             { // valid map spawn
@@ -218,7 +220,8 @@ public class ColorChange : MonoBehaviour
 			if (Target.tag != "Infected") {
                 ActiveInfected.tag = "Eating";
                 Target.tag = "Infected";
-				m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (InfectedBaseSpeed - InfectedSpeedPlusMinus, InfectedBaseSpeed + InfectedSpeedPlusMinus); 
+                CountOfInfected += 1;
+                m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (InfectedBaseSpeed - InfectedSpeedPlusMinus, InfectedBaseSpeed + InfectedSpeedPlusMinus); 
 				//GameObject.Instantiate (m_BloodSplat).transform.position = Target.transform.position;
 				//Do this in the texture. AURELIE! HERE! <3
 			}
@@ -440,6 +443,7 @@ public class ColorChange : MonoBehaviour
             int randomCivilian = UnityEngine.Random.Range(0, index);
             objects[randomCivilian].tag = "Infected";
             SoundManager(objects[randomCivilian]);
+            CountOfInfected += 1;
         }
     }
 
