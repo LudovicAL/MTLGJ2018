@@ -84,8 +84,8 @@ Transform:
   m_LocalPosition: {x: 2.3766084, y: -0.092873186, z: -0.0771271}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 4606091039903538}
   - {fileID: 4774465900602604}
+  - {fileID: 4606091039903538}
   - {fileID: 4396215207534172}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -114,7 +114,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4290302507882998}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4774465900602604
 Transform:
@@ -127,7 +127,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4290302507882998}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114129815793411750
 MonoBehaviour:
@@ -147,7 +147,7 @@ MonoBehaviour:
   CivilianBaseSpeed: 0.1
   CivilianSpeedPlusMinus: 0.05
   m_ZombieConversionRange: 0.05
-  m_NumberOfZombies: 2
+  m_NumberOfZombies: 1
   m_StartingZombieBoost: 2
   m_CurrentZombieBoost: 0
   m_ZombieBoostDegradeAmountPerNewZombie: 0.05
@@ -172,7 +172,7 @@ MonoBehaviour:
   CivilianBaseSpeed: 0.1
   CivilianSpeedPlusMinus: 0.05
   m_ZombieConversionRange: 0.05
-  m_NumberOfZombies: 2
+  m_NumberOfZombies: 3
   m_StartingZombieBoost: 2
   m_CurrentZombieBoost: 0
   m_ZombieBoostDegradeAmountPerNewZombie: 0.05

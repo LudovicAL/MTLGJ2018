@@ -73,7 +73,6 @@ public class CanvasManager : MonoBehaviour {
 	}
 
 	public void WorkerButtonPress(int buttonNo) {
-		Debug.Log ("Pressed: " + buttonNo);
 		ControlsManager controlsManager = scriptsBucketObject != null ? scriptsBucketObject.GetComponent<ControlsManager> () : null;
 		if (controlsManager != null) {
 			controlsManager.ToggleCameraMode ();
@@ -110,7 +109,7 @@ public class CanvasManager : MonoBehaviour {
 
     public void ContinueButtonPress()
     {
-		//GameObject.Find ("Scriptsbucket").GetComponent<UserprefsManager> ().IncrementDifficulty ();
+		GameObject.Find ("Scriptsbucket").GetComponent<UserprefsManager> ().IncrementDifficulty ();
         Application.LoadLevel(Application.loadedLevel);
     }
 

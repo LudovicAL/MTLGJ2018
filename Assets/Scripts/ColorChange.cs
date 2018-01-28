@@ -8,7 +8,6 @@ public class ColorChange : MonoBehaviour
 {
 	public List<DifficultyParameters> m_DifficultyParameters;
 	public int m_DifficultyCurrentLevel = 0;
-
     //I love you Christ
 	private GameStatesManager gameStatesManager;
 	private StaticData.AvailableGameStates gameState;
