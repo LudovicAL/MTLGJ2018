@@ -8,7 +8,8 @@ public class ColorChange : MonoBehaviour
 {
 
     //I love you Christ
-
+	private GameStatesManager gameStatesManager;
+	private StaticData.AvailableGameStates gameState;
     List<Vector2> GridList = new List<Vector2>();
     Color CurrentColor;
     Color NewColor;
@@ -23,6 +24,7 @@ public class ColorChange : MonoBehaviour
 	float m_ZombieConversionRange = 0.05f;
     public int CountOfInfected;
     public int StartingCivilians = 3000;
+    public int CountOfCivilians ;
 
     public AudioClip Afraid;
     public AudioClip Moans;
@@ -36,10 +38,17 @@ public class ColorChange : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+		gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
+		gameStatesManager.MenuGameState.AddListener(OnMenu);
+		gameStatesManager.StartingGameState.AddListener(OnStarting);
+		gameStatesManager.PlayingGameState.AddListener(OnPlaying);
+		gameStatesManager.PausedGameState.AddListener(OnPausing);
+		gameStatesManager.EndingGameState.AddListener(OnEnding);
+		SetState(gameStatesManager.gameState);
         float yAxis = Civilian.position.y;
         float xAxis = Civilian.position.x;
         m_GridOffset = -1.0f * new Vector3((m_GridWidth * 0.5f * m_GridCellWidthHeight), (m_GridHeight * 0.5f * m_GridCellWidthHeight), 0.0f);
-
+        CountOfCivilians = StartingCivilians;
         if (GameObject.Find("Map") != null)
         {
             g_MapReader = GameObject.Find("Map").GetComponent<MapReader>();
@@ -80,60 +89,61 @@ public class ColorChange : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		DrawDebugGrid();
-        UpdateCivilianGameObjectLists();
-		m_InfectedUpdatedThisFrame = 0;
+		if (gameState == StaticData.AvailableGameStates.Playing) {
+			DrawDebugGrid();
+	        UpdateCivilianGameObjectLists();
+			m_InfectedUpdatedThisFrame = 0;
 
-        int amountOfCivilians = m_Civilians.Length;
-        for (int i = 0; i < amountOfCivilians; ++i)
-        {
-            switch (m_Civilians[i].tag)
-            {
-                case "Eating":
-                    ZombieDecay(m_Civilians[i],i, -0.025f);
-                    if (!IsHungry(m_Civilians[i]))
-                    {
-                        m_Civilians[i].tag = "Infected";
-                    }
-                    break;
-                case "Dead":
+	        int amountOfCivilians = m_Civilians.Length;
+	        for (int i = 0; i < amountOfCivilians; ++i)
+	        {
+	            switch (m_Civilians[i].tag)
+	            {
+	                case "Eating":
+	                    ZombieDecay(m_Civilians[i],i, -0.025f);
+	                    if (!IsHungry(m_Civilians[i]))
+	                    {
+	                        m_Civilians[i].tag = "Infected";
+	                    }
+	                    break;
+	                case "Dead":
 
-                    break;
-					
-                case "Civilian":
-					MoveHumanRandomly(m_Civilians[i], i, 0.3f);
-                    break;
-			    case "Infected":
-				    ZombieDecay (m_Civilians[i], i, 0.025f);
+	                    break;
+						
+	                case "Civilian":
+						MoveHumanRandomly(m_Civilians[i], i, 0.3f);
+	                    break;
+				    case "Infected":
+					    ZombieDecay (m_Civilians[i], i, 0.025f);
 
-				    if (i > m_InfectedIndex && m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) 
-				    {
-					    ++m_InfectedUpdatedThisFrame;
-					    m_InfectedIndex = i;
-					    GetClosestCivilian(m_Civilians[i], i);
-				    }
-					
-                    if (IsHungry(m_Civilians[i]))
-                    {
-						if (m_InfectedTargets[i] != null)
-                        {
-							RushCivilian(m_Civilians[i], m_InfectedTargets[i], i);
-                        }
-                        else
-                        {
-						MoveHumanRandomly(m_Civilians[i], i, 0.5f);
-                        }
-                    }
+					    if (i > m_InfectedIndex && m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) 
+					    {
+						    ++m_InfectedUpdatedThisFrame;
+						    m_InfectedIndex = i;
+						    GetClosestCivilian(m_Civilians[i], i);
+					    }
+						
+	                    if (IsHungry(m_Civilians[i]))
+	                    {
+							if (m_InfectedTargets[i] != null)
+	                        {
+								RushCivilian(m_Civilians[i], m_InfectedTargets[i], i);
+	                        }
+	                        else
+	                        {
+							MoveHumanRandomly(m_Civilians[i], i, 0.5f);
+	                        }
+	                    }
 
-                    break;
-            }
+	                    break;
+	            }
 
-        }
+	        }
 
-		if (m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) {
-			m_InfectedIndex = 0;
+			if (m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) {
+				m_InfectedIndex = 0;
+			}
 		}
-
     }
 
 	void ZombieDecay(GameObject ActiveInfected, int humanIndex, float DecayRate)
@@ -152,6 +162,7 @@ public class ColorChange : MonoBehaviour
             Color ActiveSpriteColor = ActiveSprite.color;
             ActiveSprite.color = new Color(0.0f, 0.0f, 0.0f, 0.40f);
             ActiveInfected.tag = "Dead";
+            CountOfInfected -= 1;
         }
         else
         {
@@ -221,6 +232,7 @@ public class ColorChange : MonoBehaviour
                 ActiveInfected.tag = "Eating";
                 Target.tag = "Infected";
                 CountOfInfected += 1;
+                CountOfCivilians -= 1;
                 m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (InfectedBaseSpeed - InfectedSpeedPlusMinus, InfectedBaseSpeed + InfectedSpeedPlusMinus); 
 				//GameObject.Instantiate (m_BloodSplat).transform.position = Target.transform.position;
 				//Do this in the texture. AURELIE! HERE! <3
@@ -457,4 +469,36 @@ public class ColorChange : MonoBehaviour
         Source.maxDistance = 11f;
         Source.PlayOneShot(Afraid);
     }
+
+	//Listener functions a defined for every GameState
+	protected void OnMenu() {
+		SetState (StaticData.AvailableGameStates.Menu);
+	}
+
+	protected void OnStarting() {
+		SetState (StaticData.AvailableGameStates.Starting);
+
+	}
+
+	protected void OnPlaying() {
+		SetState (StaticData.AvailableGameStates.Playing);
+
+	}
+
+	protected void OnPausing() {
+		SetState (StaticData.AvailableGameStates.Paused);
+	}
+
+	protected void OnEnding() {
+		SetState (StaticData.AvailableGameStates.Ending);
+	}
+
+	private void SetState(StaticData.AvailableGameStates state) {
+		gameState = state;
+	}
+
+	//Use this function to request a game state change from the GameStateManager
+	private void RequestGameStateChange(StaticData.AvailableGameStates state) {
+		gameStatesManager.ChangeGameState (state);
+	}
 }
