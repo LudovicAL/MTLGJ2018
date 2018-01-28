@@ -231,8 +231,8 @@ public class ColorChange : MonoBehaviour
         for (int i = 0; i < amountOfCivilians; ++i)
         {
             m_CivilianGridIndex[i] = 0;
-			int[i] = new Vector3;
-			m_HumanSpeeds[i] = new Vector3[amountOfCivilians];
+			m_HumanSpeeds [i] = 0;
+			m_HumanHeadings[i] = new Vector3(0.0f, 0.0f, 0.0f);
         }
 
     }
