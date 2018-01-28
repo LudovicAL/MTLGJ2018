@@ -353,6 +353,11 @@ Prefab:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114990470629987104, guid: 2538036ac9506644faec047d069145e8,
+        type: 2}
+      propertyPath: cameraSpeed
+      value: 15
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2538036ac9506644faec047d069145e8, type: 2}
   m_IsPrefabParent: 0
