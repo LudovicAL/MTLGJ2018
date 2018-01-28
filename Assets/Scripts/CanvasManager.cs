@@ -7,13 +7,17 @@ public class CanvasManager : MonoBehaviour {
 
 	public GameObject workerButtonPrefab;
 	public int numberOfWorkers = 1;
+	public Sprite spriteBusyWorker;
+	public Sprite spriteFreeWorker;
 	private EndGame eg;
 	private GameObject panelGame;
+	private GameObject scriptsBucketObject;
 	private GameStatesManager gameStatesManager;	//Refers to the GameStateManager
 	private StaticData.AvailableGameStates gameState;	//Mimics the GameStateManager's gameState variable at all time
 	private Text textCasualties;
 	private Text textSurvivors;
 	private Text textRatio;
+	private List<GameObject> workerButtons;
 
 	// Use this for initialization
 	void Start () {
@@ -32,12 +36,16 @@ public class CanvasManager : MonoBehaviour {
 		gameStatesManager.PausedGameState.AddListener(OnPausing);
 		gameStatesManager.EndingGameState.AddListener(OnEnding);
 		SetState (gameStatesManager.gameState);
+		workerButtons = new List<GameObject> ();
 		for (int i = 0; i < numberOfWorkers; i++) {
 			int index = i;
 			GameObject newButton = GameObject.Instantiate (workerButtonPrefab, panelGame.transform);
 			newButton.GetComponent<Button> ().onClick.AddListener (delegate{WorkerButtonPress(index);});
+			workerButtons.Add (newButton);
 		}
 		showPanel ("Panel Menu");
+		scriptsBucketObject = GameObject.Find ("Scriptsbucket");
+		UpdateWorkerButtons (true);
 	}
 	
 	// Update is called once per frame
@@ -61,6 +69,28 @@ public class CanvasManager : MonoBehaviour {
 
 	public void WorkerButtonPress(int buttonNo) {
 		Debug.Log ("Pressed: " + buttonNo);
+		ControlsManager controlsManager = scriptsBucketObject != null ? scriptsBucketObject.GetComponent<ControlsManager> () : null;
+		if (controlsManager != null) {
+			controlsManager.ToggleCameraMode ();
+			bool newIsInCameraMode = controlsManager.GetIsInCameraMode ();
+
+			// TODO: if we ever have more than one button, change only the one that gets changed
+			UpdateWorkerButtons(newIsInCameraMode);
+		}
+	}
+
+	void UpdateWorkerButtons(bool _isInCameraMode)
+	{
+		foreach (GameObject go in workerButtons) {
+			Transform backgroundImage = go.transform.FindChild ("BackgroundImage");
+			if (backgroundImage != null) {
+				backgroundImage.GetComponent<Image> ().color = _isInCameraMode ? Color.green : Color.yellow;
+			}
+			Transform workerImage = go.transform.FindChild ("Image Worker");
+			if (workerImage != null) {
+				workerImage.GetComponent<Image> ().sprite = _isInCameraMode ? spriteFreeWorker : spriteBusyWorker;
+			}
+		}
 	}
 
 	public void StartButtonPress() {
