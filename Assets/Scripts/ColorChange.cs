@@ -247,6 +247,12 @@ public class ColorChange : MonoBehaviour
                 CountOfInfected += 1;
                 CountOfCivilians -= 1;
 
+				//Register zombie for panic
+				int gridX = GetGridXCoordinateFromWorldPosition (Target.transform.position.x);
+				int gridY = GetGridYCoordinateFromWorldPosition (Target.transform.position.y);
+
+				SetGridsWithZombies (gridX, gridY);
+
 				//g_MapReader.AddBloodSplat (Target.transform.position, 6, 20);
 				g_MapReader.AddBloodSplat (Target.transform.position, 3, 10);
 
@@ -309,7 +315,7 @@ public class ColorChange : MonoBehaviour
 		float terrorModifier = 1.0f;
 		if (ActiveHuman.tag != "Infected" && m_GridsWithZombies [m_CivilianGridIndex[humanIndex]]) 
 		{
-			terrorModifier = 0.25f * (float)CountOfInfected;
+			terrorModifier = 0.02f * (float)CountOfInfected;
 
 			if (terrorModifier > 4.0f) 
 			{
@@ -426,25 +432,31 @@ public class ColorChange : MonoBehaviour
                 GameObjectGridList[newCivilianGridIndex].Add(m_Civilians[i]);
 				if (m_Civilians[i].tag == "Infected")
 				{
-					m_GridsWithZombies [newCivilianGridIndex] = true;
-					if (gridX < m_GridWidth - 1) {
-						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX + 1,gridY)] = true;
-					}
-					if (gridX > 0) {
-						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX - 1,gridY)] = true;
-					}
-					if (gridY < m_GridHeight - 1) {
-						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY + 1)] = true;
-					}
-					if (gridY > 0) {
-						m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY - 1)] = true;
-					}
+					SetGridsWithZombies (gridX, gridY);
 				}
 
                 m_CivilianGridIndex[i] = newCivilianGridIndex;
             }
         }
     }
+
+	void SetGridsWithZombies(int gridX, int gridY)
+	{
+		m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY)] = true;
+
+		if (gridX < m_GridWidth - 1) {
+			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX + 1,gridY)] = true;
+		}
+		if (gridX > 0) {
+			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX - 1,gridY)] = true;
+		}
+		if (gridY < m_GridHeight - 1) {
+			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY + 1)] = true;
+		}
+		if (gridY > 0) {
+			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY - 1)] = true;
+		}
+	}
 
     void Test_DrawCivilianGameObjectListDebugLinesStaggered()
     {
