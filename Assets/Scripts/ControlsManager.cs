@@ -51,15 +51,19 @@ public class ControlsManager : MonoBehaviour {
 		if (gameState == StaticData.AvailableGameStates.Playing) {
 			if (Application.isMobilePlatform) {	//ON MOBILE
 				if (Input.touchCount > 0) {	//USER HAS FINGER(S) ON
+					Debug.Log("Touches detected");
 					if (Input.touchCount == 1) {	//USER HAS 1 FINGER ON THE SCREEN
+						Debug.Log("1 touch detected");
 						if (wallConstructionMode) {
 							TouchWallConstructionController ();
-						} else  {
+						} else {
 							TouchScreenMoveController ();
 						}
 					} else if (Input.touchCount == 2) { //USER HAS 2 FINGERS ON THE SCREEN
+						Debug.Log("2 touches detected");
 						TouchScreenZoomController();
 					} else {	//USER HAS TOO MANY FINGERS ON THE SCREEN
+						Debug.Log("Too many touches detected");
 						WallCanceled();
 						MovingScreenCanceled ();
 						ScreenZoomCanceled ();
@@ -78,14 +82,19 @@ public class ControlsManager : MonoBehaviour {
 	//Decides what to do with 2 fingers touch on the screen
 	public void TouchScreenZoomController() {
 		if (Input.touches[0].phase == TouchPhase.Ended || Input.touches[1].phase == TouchPhase.Ended) {
+			Debug.Log("Screen zoom ended");
 			ScreenZoomEnded ();
 		} else if (Input.touches[0].phase == TouchPhase.Canceled || Input.touches[1].phase == TouchPhase.Canceled) {
+			Debug.Log("Screen zoom canceled");
 			ScreenZoomCanceled ();
 		} else if (Input.touches[0].phase == TouchPhase.Began) {
+			Debug.Log("Screen zoom began");
 			distanceBetweenFingers = Vector2.Distance(Input.GetTouch(0).position, Input.GetTouch(1).position);
 			ScreenZoomBegan ();
 		} else if (Input.touches[0].phase != TouchPhase.Stationary || Input.touches[1].phase != TouchPhase.Stationary) {
+			Debug.Log("Is it a screen zoom move or a screen zoom stationary?");
 			if (zoomingScreen)  {
+				Debug.Log("Screen zoom moved");
 				float newDistance = distanceBetweenFingers = Vector2.Distance(Input.GetTouch(0).position, Input.GetTouch(1).position);
 				float direction = newDistance - distanceBetweenFingers;
 				ScreenZoomMoved (Mathf.Sign(direction));
@@ -118,8 +127,10 @@ public class ControlsManager : MonoBehaviour {
 	public void MouseClickController() {
 		if (Input.GetMouseButton(0)) { //USER IS PRESSING THE MOUSE BUTTON
 			if (Input.GetMouseButtonDown(0)) { //USER PRESSED THE MOUSE BUTTON
+				Debug.Log ("WallBegan");
 				WallBegan (Input.mousePosition);
 			} else {	//USER JUST KEPT PRESSING THE MOUSE BUTTON
+				Debug.Log ("WallMoved");
 				WallMoved (Input.mousePosition);
 			}
 		} else if (Input.GetMouseButtonUp(0)) {	//USER RELEASED THE MOUSE BUTTON
@@ -153,15 +164,19 @@ public class ControlsManager : MonoBehaviour {
 	public void TouchScreenMoveController() {
 		switch (Input.GetTouch(0).phase) {
 			case TouchPhase.Began:
+				Debug.Log("Screen Move Began");
 				MovingScreenBegan ();
 				break;
 			case TouchPhase.Moved:
+				Debug.Log("Screen Move Moved");
 				MovingScreenMoved ();
 				break;
 			case TouchPhase.Ended:
+				Debug.Log("Screen Move Ended");
 				MovingScreenEnded ();
 				break;
 			case TouchPhase.Canceled:
+				Debug.Log("Screen Move Canceled");
 				MovingScreenCanceled ();
 				break;
 			default:
