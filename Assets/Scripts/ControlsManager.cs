@@ -6,7 +6,8 @@ using UnityEngine.EventSystems;
 public class ControlsManager : MonoBehaviour {
 	public float cameraSpeed = 15.0f;
 	//public float updateGap = 0.02f;
-	private Vector3 poiterInitialPosition;
+	private Vector3 m_PreviousPointerPosition;
+	//private 
 	private float distanceBetweenFingers;
 	private LineRenderer hollowLine;
 	private LineRenderer m_BadLine;
@@ -24,7 +25,6 @@ public class ControlsManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		poiterInitialPosition = Vector2.zero;
 		distanceBetweenFingers = 0.0f;
 		nextUpdateTime = 0.0f;
 		cameraTransform = Camera.main.transform;
@@ -86,9 +86,9 @@ public class ControlsManager : MonoBehaviour {
 			if (Input.GetMouseButton(0)) {
 				if (!(EventSystem.current.IsPointerOverGameObject())) {
 					if (Input.GetMouseButtonDown(0)) {
-						poiterInitialPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+						m_PreviousPointerPosition = Input.mousePosition;
 					}
-					MoveScreenMagically(Camera.main.ScreenToWorldPoint (Input.mousePosition));
+					MoveScreenMagically(Input.mousePosition);
 				}
 			}
 		}
@@ -96,9 +96,6 @@ public class ControlsManager : MonoBehaviour {
 
 	//Decides what to do with keyboard button clicks
 	public void KeyboardButtonController() {
-		if (Input.GetMouseButtonDown(0)) {
-			poiterInitialPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-		}
 		if (Input.GetButton("Horizontal") ) {	//USER IS PRESSING A HORIZONTAL ARROW KEY
 			MoveCameraHorizontally(-Mathf.Sign(Input.GetAxis("Horizontal")));
 		} else if (Input.GetButton("Vertical")) {	//USER IS PRESSING A VERTICAL ARROW KEY
@@ -168,14 +165,21 @@ public class ControlsManager : MonoBehaviour {
 	}
 
 	public void MoveScreenMagically(Vector3 fingerPosition) {
-		Vector3 direction = fingerPosition - poiterInitialPosition;
-		direction.z = Camera.main.transform.position.z;
-		Camera.main.transform.position = direction;
+		Vector3 direction = Camera.main.ScreenToWorldPoint (fingerPosition) - Camera.main.ScreenToWorldPoint (m_PreviousPointerPosition);
+		direction.z = 0.0f;
+		//Debug.Log ("normal");
+		//Debug.Log (direction);
+		direction = -direction;
+		//Debug.Log ("inverted");
+		//Debug.Log (direction);
+
+		Camera.main.transform.position += direction;
+		m_PreviousPointerPosition = fingerPosition;
 	}
 
 	//Player asked to move the screen in the current frame
 	private void MovingScreenBegan() {
-		poiterInitialPosition = Camera.main.ScreenToWorldPoint (Input.GetTouch (0).position);
+		m_PreviousPointerPosition = Input.GetTouch (0).position;
 		movingScreen = true;
 	}
 
