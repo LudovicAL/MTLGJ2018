@@ -137,19 +137,16 @@ public class MapReader : MonoBehaviour {
 
 		//Debug.Log ("pixel coords: (" + pixelCoordA[0] + ", " + pixelCoordA[1] + "), (" + pixelCoordB[0] + ", " + pixelCoordB[1] + ")");
 
-<<<<<<< HEAD
 	}
 
 	void QueueWallPixelsBetweenPoints_Bresenham(int[] _startPixelCoord, int[] _endPixelCoord)
 	{
-=======
 		// clamp outside points
 		_startPixelCoord [0] = Mathf.Clamp (_startPixelCoord [0], 0, m_Width-1);
 		_startPixelCoord [1] = Mathf.Clamp (_startPixelCoord [1], 0, m_Height-1);
 		_endPixelCoord [0] = Mathf.Clamp (_endPixelCoord [0], 0, m_Width-1);
 		_endPixelCoord [1] = Mathf.Clamp (_endPixelCoord [1], 0, m_Height-1);
 
->>>>>>> 91c3aca99860ea14a626210bfe273eda9a8f2186
 		float dx = Mathf.Abs (_endPixelCoord [0] - _startPixelCoord [0]);
 		float dy = Mathf.Abs (_endPixelCoord [1] - _startPixelCoord [1]);
 
