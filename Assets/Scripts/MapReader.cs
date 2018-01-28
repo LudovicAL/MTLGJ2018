@@ -8,32 +8,22 @@ public class MapReader : MonoBehaviour {
 	List<int[]> m_WhiteSpots;
 	int m_Width;
 	int m_Height;
-	public Texture2D MapTexture; 
-	private Texture2D m_DrawTexture;
-	private Texture2D m_ColoredWallTexture;
+	private Texture2D m_CityTexture;
+	private Texture2D m_RuntimeColoredWallTexture;
+
 
 	void Awake() {
 
-		if (MapTexture == null) {
-			Debug.Log ("Could not find texture, will not load map.");
-			return;
-		}
+		m_CityTexture = GameObject.Find ("Map").GetComponent<SpriteRenderer> ().sprite.texture;
 
-		m_DrawTexture = GameObject.Find ("Map").GetComponent<SpriteRenderer> ().sprite.texture;
-		m_ColoredWallTexture = GameObject.Find ("BlankMapForWalls").GetComponent<SpriteRenderer> ().sprite.texture;
-
-		if (m_ColoredWallTexture == null) {
-			Debug.Log ("Could not find blank wall texture, will not load map.");
-		}
-
-		m_Width = MapTexture.width;
-		m_Height = MapTexture.height;
+		m_Width = m_CityTexture.width;
+		m_Height = m_CityTexture.height;
 		m_Bitmap = new bool[m_Width,m_Height];
 		m_WhiteSpots = new List<int[]>();
 
 		for (int i = 0; i < m_Width; ++i) {
 			for (int j = 0; j < m_Height; ++j) {
-				Color color = MapTexture.GetPixel (i, j);
+				Color color = m_CityTexture.GetPixel (i, j);
 				bool isFreeSpot = color == Color.white;
 
 				m_Bitmap [i,j] = isFreeSpot ? true : false;
@@ -47,11 +37,13 @@ public class MapReader : MonoBehaviour {
 	}
 
 	void Start() {
-		
-		SpriteRenderer renderer = GetComponent<SpriteRenderer> ();
-		if (renderer != null) {
-			Texture2D newTex = (Texture2D)GameObject.Instantiate(MapTexture);
-			renderer.sprite = Sprite.Create(newTex, renderer.sprite.rect, new Vector2(0.5f, 0.5f));
+		GameObject blankMapForWalls = GameObject.Find ("BlankMapForWalls");
+		if (blankMapForWalls != null) {
+			SpriteRenderer renderer = blankMapForWalls.GetComponent<SpriteRenderer> ();
+			if (renderer != null) {
+				m_RuntimeColoredWallTexture = (Texture2D)GameObject.Instantiate (renderer.sprite.texture);
+				renderer.sprite = Sprite.Create (m_RuntimeColoredWallTexture, renderer.sprite.rect, new Vector2 (0.5f, 0.5f));
+			}
 		}
 	}
 
@@ -109,7 +101,7 @@ public class MapReader : MonoBehaviour {
 	}
 
 	public void AddWall(List<Vector2> _wallCoords)
-	{
+	{			
 		for (int i = 1; i < _wallCoords.Count; ++i) {
 			Vector2 wallCoordA = _wallCoords [i-1];
 			Vector2 wallCoordB = _wallCoords [i];
@@ -176,8 +168,7 @@ public class MapReader : MonoBehaviour {
 			float err = dx / 2.0f;
 			while (x != x1) {
 				m_Bitmap [x, y] = false;
-				m_DrawTexture.SetPixel ((int)x, (int)y, Color.black);
-				m_ColoredWallTexture.SetPixel ((int)x, (int)y, Color.yellow);
+				m_RuntimeColoredWallTexture.SetPixel ((int)x, (int)y, Color.yellow);
 						
 				err -= dy;
 				if (err < 0) {
@@ -192,8 +183,7 @@ public class MapReader : MonoBehaviour {
 			float err = dy / 2.0f;
 			while (y != y1) {
 				m_Bitmap [x, y] = false;
-				m_DrawTexture.SetPixel ((int)x, (int)y, Color.black);
-				m_ColoredWallTexture.SetPixel ((int)x, (int)y, Color.yellow);
+				m_RuntimeColoredWallTexture.SetPixel ((int)x, (int)y, Color.yellow);
 				err -= dx;
 				if (err < 0) {
 					x += sx;
@@ -204,14 +194,12 @@ public class MapReader : MonoBehaviour {
 		}
 
 		m_Bitmap [x1, y1] = false;
-		m_DrawTexture.SetPixel ((int)x1, (int)y1, Color.black);
-		m_ColoredWallTexture.SetPixel ((int)x1, (int)y1, Color.yellow);
+		m_RuntimeColoredWallTexture.SetPixel ((int)x1, (int)y1, Color.yellow);
 	}
 
 	void PushWallPixels()
 	{
-		m_DrawTexture.Apply();
-		m_ColoredWallTexture.Apply();
+		m_RuntimeColoredWallTexture.Apply();
 	}
 }
 
