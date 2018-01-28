@@ -22,11 +22,14 @@ public class ColorChange : MonoBehaviour
 	bool m_HasMapReader = false;
 	float m_ZombieConversionRange = 0.05f;
 
-	int m_MaxNumberOfInfectedToUpdateEachFrame = 100;
+    public AudioClip Afraid;
+    public AudioClip Moans;
+    private AudioSource Source;
+    int m_NumberOfZombies = 1;
+
+    int m_MaxNumberOfInfectedToUpdateEachFrame = 100;
 	int m_InfectedIndex = 0;
 	int m_InfectedUpdatedThisFrame = 0;
-
-	//SOURCE TREE SUCKS MY BALLS
 
     // Use this for initialization
     void Start()
@@ -49,15 +52,15 @@ public class ColorChange : MonoBehaviour
                 xAxis = randomSpawnPos[0];
                 yAxis = randomSpawnPos[1];
             }
-            else
-            { // test spawn
-                xAxis += 2;
-                if (xAxis >= 35)
-                {
-                    xAxis = Civilian.position.x;
-                    yAxis += 2;
-                }
-            }
+            //else
+            //{ // test spawn
+            //    xAxis += 2;
+            //    if (xAxis >= 35)
+            //    {
+            //        xAxis = Civilian.position.x;
+            //        yAxis += 2;
+            //    }
+            //}
 
 
 
@@ -68,7 +71,7 @@ public class ColorChange : MonoBehaviour
 
         BuildInitialListOfCivilians();
         SetupGameObjectGridList();
-        InitialInfect();
+        InitialInfection();
 
     }
 
@@ -138,6 +141,8 @@ public class ColorChange : MonoBehaviour
 
         if (ActiveSprite.color.g <= 0.0f)
         {
+            Color ActiveSpriteColor = ActiveSprite.color;
+            ActiveSprite.color = new Color(0.0f, 0.0f, 0.0f, 0.40f);
             ActiveInfected.tag = "Dead";
         }
         else
@@ -181,7 +186,7 @@ public class ColorChange : MonoBehaviour
 
         foreach (var obj in GameObjectGridList[m_CivilianGridIndex[i]])
         {
-            if (obj.tag != "Infected")
+            if (obj.tag == "Civilian")
             {
                 float TargetDist = Vector3.Distance(currentPosition, obj.transform.position);
                 if (TargetDist < ClosestDist)
@@ -205,7 +210,8 @@ public class ColorChange : MonoBehaviour
 		if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= m_ZombieConversionRange)
         {
 			if (Target.tag != "Infected") {
-				Target.tag = "Infected";
+                ActiveInfected.tag = "Eating";
+                Target.tag = "Infected";
 				m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (InfectedBaseSpeed - InfectedSpeedPlusMinus, InfectedBaseSpeed + InfectedSpeedPlusMinus); 
 				//GameObject.Instantiate (m_BloodSplat).transform.position = Target.transform.position;
 				//Do this in the texture. AURELIE! HERE! <3
@@ -419,13 +425,26 @@ public class ColorChange : MonoBehaviour
 	}
 
 
-    void InitialInfect()
+    void InitialInfection()
     {
-
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Civilian");
-        int index = objects.Length;
-        int randomCivilian = UnityEngine.Random.Range(0, index);
-        objects[randomCivilian].tag = "Infected";
+        for (int i = 1; i <= m_NumberOfZombies; ++i)
+        {
+            int index = objects.Length;
+            int randomCivilian = UnityEngine.Random.Range(0, index);
+            objects[randomCivilian].tag = "Infected";
+            SoundManager(objects[randomCivilian]);
+        }
+    }
 
+    void SoundManager(GameObject ActiveObject)
+    {
+        ActiveObject.AddComponent<AudioSource>();
+        Source = ActiveObject.GetComponent<AudioSource>();
+        Source.spatialBlend = 1;
+        Source.rolloffMode = AudioRolloffMode.Linear;
+        Source.minDistance = 9f;
+        Source.maxDistance = 11f;
+        Source.PlayOneShot(Afraid);
     }
 }

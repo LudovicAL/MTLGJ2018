@@ -224,6 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338ce51d7f94bfc46904bfb39507fe97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MapTexture: {fileID: 2800000, guid: bc577618475006048bf93263b0ac3f83, type: 3}
 --- !u!212 &1251596690
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -294,6 +295,7 @@ GameObject:
   - component: {fileID: 1717725072}
   - component: {fileID: 1717725071}
   - component: {fileID: 1717725070}
+  - component: {fileID: 1717725074}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -335,7 +337,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 4.4237366
+  orthographic size: 1.4264278
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -363,6 +365,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1717725074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1717725069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc09e8e9f6a96bd4eb7dfe78e2105119, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2046473448
 GameObject:
   m_ObjectHideFlags: 0
