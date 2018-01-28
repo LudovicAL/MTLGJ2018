@@ -245,7 +245,7 @@ public class ColorChange : MonoBehaviour
                 CountOfInfected += 1;
                 CountOfCivilians -= 1;
 
-				g_MapReader.AddBloodSplat (Target.transform.position, 10);
+				g_MapReader.AddBloodSplat (Target.transform.position, 6, 20);
 
                 GameObject.Find("CurrentInfected").GetComponent<Text>().text= CountOfInfected + " Infected";
 

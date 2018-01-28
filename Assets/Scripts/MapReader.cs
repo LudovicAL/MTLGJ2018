@@ -202,7 +202,7 @@ public class MapReader : MonoBehaviour {
 		m_RuntimeColoredWallTexture.Apply();
 	}
 		
-	public void AddBloodSplat(Vector3 bloodSplatCoord, int bloodSplatRadius)
+	public void AddBloodSplat(Vector3 bloodSplatCoord, int bloodSplatRadius, int amountOfSplats)
 	{
 		int[] pixelCoords = ConvertWorldCoordToPixelCoord (bloodSplatCoord[0], bloodSplatCoord[1]);
 
@@ -214,14 +214,16 @@ public class MapReader : MonoBehaviour {
 
 		m_CityTexture.SetPixel(pixelCoords[0], pixelCoords[1], Color.red);
 
-		for (int i = 0; i < 20; ++i)
+		for (int i = 0; i < amountOfSplats; ++i)
 		{
 			int newX = pixelCoords[0] + Random.Range(-bloodSplatRadius, bloodSplatRadius);	
 			int newY = pixelCoords[1] + Random.Range(-bloodSplatRadius, bloodSplatRadius);	
 
 			if (newX >= 0 && newX < m_Width && newY >= 0 || newY < m_Height)
 			{
-				m_CityTexture.SetPixel(newX, newY, Color.red);
+				Color bloodColor = Color.red;
+				bloodColor.r = 0.65f;
+				m_CityTexture.SetPixel(newX, newY, bloodColor);
 			}
 		}
 	}
