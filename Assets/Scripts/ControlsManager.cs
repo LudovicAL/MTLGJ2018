@@ -114,19 +114,15 @@ public class ControlsManager : MonoBehaviour {
 	public void TouchScreenMoveController() {
 		switch (Input.GetTouch(0).phase) {
 			case TouchPhase.Began:
-				Debug.Log("Screen Move Began");
 				MovingScreenBegan ();
 				break;
 			case TouchPhase.Moved:
-				Debug.Log("Screen Move Moved");
 				MovingScreenMoved ();
 				break;
 			case TouchPhase.Ended:
-				Debug.Log("Screen Move Ended");
 				MovingScreenEnded ();
 				break;
 			case TouchPhase.Canceled:
-				Debug.Log("Screen Move Canceled");
 				MovingScreenCanceled ();
 				break;
 			default:
@@ -171,11 +167,7 @@ public class ControlsManager : MonoBehaviour {
 	public void MoveScreenMagically(Vector3 fingerPosition) {
 		Vector3 direction = Camera.main.ScreenToWorldPoint (fingerPosition) - Camera.main.ScreenToWorldPoint (m_PreviousPointerPosition);
 		direction.z = 0.0f;
-		//Debug.Log ("normal");
-		//Debug.Log (direction);
 		direction = -direction;
-		//Debug.Log ("inverted");
-		//Debug.Log (direction);
 
 		Vector3 newPosition = Camera.main.transform.position + direction;
 		newPosition.z = mapTransform.position.z;
