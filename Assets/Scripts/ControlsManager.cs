@@ -9,6 +9,7 @@ public class ControlsManager : MonoBehaviour {
 	private Vector3 poiterInitialPosition;
 	private float distanceBetweenFingers;
 	private LineRenderer hollowLine;
+	private LineRenderer m_BadLine;
 	private float nextUpdateTime;
 	private Transform cameraTransform;
 	private List<Vector2> coordList;
@@ -34,6 +35,7 @@ public class ControlsManager : MonoBehaviour {
 		screenHeight = Screen.height;
 		isInCameraMode = true;
 		hollowLine = GameObject.Find("Line").GetComponent<LineRenderer>();
+		m_BadLine = GameObject.Find("BadLine").GetComponent<LineRenderer>();
 		gameStatesManager = GameObject.Find ("Scriptsbucket").GetComponent<GameStatesManager>();
 		gameStatesManager.MenuGameState.AddListener(OnMenu);
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
@@ -212,8 +214,8 @@ public class ControlsManager : MonoBehaviour {
 		m_WallBuilding = false;
 		m_WallAlmostFinished = false;
 		m_WallFinished = false;
-		hollowLine.positionCount = 0;
-		hollowLine.enabled = true;
+		m_BadLine.positionCount = 0;
+		m_BadLine.enabled = true;
 
 		Vector3 convertedCoord = Camera.main.ScreenToWorldPoint (coord);
 		if (!m_MapReaderObject.GetComponent<MapReader> ().CanMoveThere (convertedCoord [0], convertedCoord [1])) 
@@ -221,6 +223,9 @@ public class ControlsManager : MonoBehaviour {
 			m_PreviousCoord = convertedCoord;
 			m_PreviousCoord.z = 0;
 			m_FoundStartingPoint = true;
+
+			++m_BadLine.positionCount;
+			m_BadLine.SetPosition (m_BadLine.positionCount - 1, convertedCoord);
 		}
 	}
 
@@ -260,6 +265,9 @@ public class ControlsManager : MonoBehaviour {
 			{
 				if (!m_WallBuilding) 
 				{
+					hollowLine.positionCount = 0;
+					hollowLine.enabled = true;
+
 					m_WallBuilding = true;
 					coordList.Add(m_PreviousCoord);
 					++hollowLine.positionCount;
@@ -269,12 +277,16 @@ public class ControlsManager : MonoBehaviour {
 		}
 			
 
-		if (m_WallBuilding) 
-		{
+		if (m_WallBuilding) {
 			coordList.Add (convertedCoord);
 			//nextUpdateTime = Time.time + updateGap;
 			++hollowLine.positionCount;
 			hollowLine.SetPosition (hollowLine.positionCount - 1, convertedCoord);
+		} 
+		else 
+		{
+			++m_BadLine.positionCount;
+			m_BadLine.SetPosition (m_BadLine.positionCount - 1, convertedCoord);
 		}
 	}
 
@@ -311,6 +323,8 @@ public class ControlsManager : MonoBehaviour {
 		buildingWall = false;
 		hollowLine.enabled = false;
 		hollowLine.positionCount = 0;
+		m_BadLine.enabled = false;
+		m_BadLine.positionCount = 0;
 	}
 
 	//A wall has to be drawn
