@@ -216,6 +216,8 @@ public class ColorChange : MonoBehaviour
     List<List<GameObject>> GameObjectGridList = new List<List<GameObject>>();
     GameObject[] m_Civilians;
     int[] m_CivilianGridIndex;
+	int[] m_HumanSpeeds;
+	Vector3[] m_HumanHeadings;
 
     void BuildInitialListOfCivilians()
     {
