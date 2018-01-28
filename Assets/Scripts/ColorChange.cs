@@ -92,7 +92,7 @@ public class ColorChange : MonoBehaviour
 					MoveHumanRandomly(m_Civilians[i], i, 0.3f);
                     break;
 			case "Infected":
-				ZombieDecay (m_Civilians [i]);
+				ZombieDecay (m_Civilians [i], i);
 
 				if (i > m_InfectedIndex && m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) 
 				{
@@ -124,7 +124,7 @@ public class ColorChange : MonoBehaviour
 
     }
 
-    void ZombieDecay(GameObject ActiveInfected)
+	void ZombieDecay(GameObject ActiveInfected, int humanIndex)
     {
         SpriteRenderer ActiveSprite;
         ActiveSprite = ActiveInfected.transform.GetComponent<SpriteRenderer>();
@@ -168,7 +168,7 @@ public class ColorChange : MonoBehaviour
             //print("Red : " + Red + "  Green : " + ActiveSprite.color.g + "  Blue : " + Blue);
             ActiveSprite.color = NewColor;
         }
-
+		m_HumanHealthIndex [humanIndex] = ActiveSprite.color.r * 2.0f; //Hooray hacks!
     }
 
     void GetClosestCivilian(GameObject ActiveInfected, int i)
@@ -247,24 +247,24 @@ public class ColorChange : MonoBehaviour
         }
     }
 
-	void MoveHumanRandomly(GameObject ActiveHuman, int HumanIndex, float maxRandomGradualHeadingChange)
+	void MoveHumanRandomly(GameObject ActiveHuman, int humanIndex, float maxRandomGradualHeadingChange)
 	{
 		float terrorModifier = 1.0f;
-		if (ActiveHuman.tag != "Infected" && m_GridsWithZombies [m_CivilianGridIndex[HumanIndex]]) {
+		if (ActiveHuman.tag != "Infected" && m_GridsWithZombies [m_CivilianGridIndex[humanIndex]]) {
 			terrorModifier = 4.0f;
 		}
-		Vector3 newDestination = ActiveHuman.transform.position + (m_HumanSpeeds[HumanIndex] * m_HumanHeadings[HumanIndex] * terrorModifier * Time.deltaTime);
+		Vector3 newDestination = ActiveHuman.transform.position + (m_HumanSpeeds[humanIndex] * m_HumanHeadings[humanIndex] * m_HumanHealthIndex [humanIndex]* terrorModifier * Time.deltaTime);
 		
 		if (CanMove (newDestination)) {
 			ActiveHuman.transform.position = newDestination;
 			Vector3 newGradualRandomHeadingchange = new Vector3 (UnityEngine.Random.Range (-maxRandomGradualHeadingChange, maxRandomGradualHeadingChange), UnityEngine.Random.Range (-maxRandomGradualHeadingChange, maxRandomGradualHeadingChange), 0.0f);
-			m_HumanHeadings [HumanIndex] = Vector3.Normalize (m_HumanHeadings [HumanIndex] + newGradualRandomHeadingchange);
+			m_HumanHeadings [humanIndex] = Vector3.Normalize (m_HumanHeadings [humanIndex] + newGradualRandomHeadingchange);
 		} 
 		else {
-			m_HumanHeadings[HumanIndex].x = UnityEngine.Random.Range(-1.0f, 1.0f);
-			m_HumanHeadings[HumanIndex].y = UnityEngine.Random.Range(-1.0f, 1.0f);
-			m_HumanHeadings[HumanIndex].z = 0.0f;
-			m_HumanHeadings [HumanIndex] = Vector3.Normalize (m_HumanHeadings [HumanIndex]);
+			m_HumanHeadings[humanIndex].x = UnityEngine.Random.Range(-1.0f, 1.0f);
+			m_HumanHeadings[humanIndex].y = UnityEngine.Random.Range(-1.0f, 1.0f);
+			m_HumanHeadings[humanIndex].z = 0.0f;
+			m_HumanHeadings [humanIndex] = Vector3.Normalize (m_HumanHeadings [humanIndex]);
 		}
 	}
 
@@ -285,6 +285,7 @@ public class ColorChange : MonoBehaviour
     GameObject[] m_Civilians;
     int[] m_CivilianGridIndex;
 	float[] m_HumanSpeeds;
+	float[] m_HumanHealthIndex;
 	Vector3[] m_HumanHeadings;
 	GameObject[] m_InfectedTargets;
 	bool[] m_GridsWithZombies;
@@ -298,6 +299,7 @@ public class ColorChange : MonoBehaviour
 		m_HumanSpeeds = new float[amountOfCivilians];
 		m_HumanHeadings = new Vector3[amountOfCivilians];
 		m_InfectedTargets = new GameObject[amountOfCivilians];
+		m_HumanHealthIndex = new float[amountOfCivilians];
 
         for (int i = 0; i < amountOfCivilians; ++i)
         {
@@ -308,6 +310,7 @@ public class ColorChange : MonoBehaviour
 			m_HumanHeadings[i].z = 0.0f;
 			m_HumanHeadings [i] = Vector3.Normalize (m_HumanHeadings [i]);
 			m_InfectedTargets[i] = null;
+			m_HumanHealthIndex [i] = 1.0f;
         }
     }
 
