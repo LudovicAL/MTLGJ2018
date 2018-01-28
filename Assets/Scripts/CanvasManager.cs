@@ -108,7 +108,7 @@ public class CanvasManager : MonoBehaviour {
 
     public void ContinueButtonPress()
     {
-		GameObject.Find ("Scriptsbucket").GetComponent<UserprefsManager> ().IncrementDifficulty ();
+		//GameObject.Find ("Scriptsbucket").GetComponent<UserprefsManager> ().IncrementDifficulty ();
         Application.LoadLevel(Application.loadedLevel);
     }
 
