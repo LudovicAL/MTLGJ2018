@@ -45,6 +45,15 @@ public class MapReader : MonoBehaviour {
 				renderer.sprite = Sprite.Create (m_RuntimeColoredWallTexture, renderer.sprite.rect, new Vector2 (0.5f, 0.5f));
 			}
 		}
+
+		GameObject cityTexture = GameObject.Find ("Map");
+		if (cityTexture != null) {
+			SpriteRenderer renderer = cityTexture.GetComponent<SpriteRenderer> ();
+			if (renderer != null) {
+				m_CityTexture = (Texture2D)GameObject.Instantiate (renderer.sprite.texture);
+				renderer.sprite = Sprite.Create (m_CityTexture, renderer.sprite.rect, new Vector2 (0.5f, 0.5f));
+			}
+		}
 	}
 
 	// Update is called once per frame
@@ -200,6 +209,37 @@ public class MapReader : MonoBehaviour {
 	void PushWallPixels()
 	{
 		m_RuntimeColoredWallTexture.Apply();
+	}
+		
+	public void AddBloodSplat(Vector3 bloodSplatCoord, int bloodSplatRadius, int amountOfSplats)
+	{
+		int[] pixelCoords = ConvertWorldCoordToPixelCoord (bloodSplatCoord[0], bloodSplatCoord[1]);
+
+		if (pixelCoords[0] < 0 || pixelCoords[0] >= m_Width)
+			return;
+
+		if (pixelCoords[1] < 0 || pixelCoords[1] >= m_Height)
+			return;
+
+		m_CityTexture.SetPixel(pixelCoords[0], pixelCoords[1], Color.red);
+
+		for (int i = 0; i < amountOfSplats; ++i)
+		{
+			int newX = pixelCoords[0] + Random.Range(-bloodSplatRadius, bloodSplatRadius);	
+			int newY = pixelCoords[1] + Random.Range(-bloodSplatRadius, bloodSplatRadius);	
+
+			if (newX >= 0 && newX < m_Width && newY >= 0 || newY < m_Height)
+			{
+				Color bloodColor = Color.red;
+				bloodColor.r = 0.65f;
+				m_CityTexture.SetPixel(newX, newY, bloodColor);
+			}
+		}
+	}
+
+	public void PushBloodPixels()
+	{
+		m_CityTexture.Apply();
 	}
 }
 

@@ -82,6 +82,7 @@ public class ColorChange : MonoBehaviour
     {
 		if (gameState == StaticData.AvailableGameStates.Playing) {
             if (!m_InitialInfectionDone) { InitialInfection(); }
+
 			DrawDebugGrid();
 	        UpdateCivilianGameObjectLists();
 			m_InfectedUpdatedThisFrame = 0;
@@ -146,6 +147,8 @@ public class ColorChange : MonoBehaviour
 
 			if (m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) {
 				m_InfectedIndex = 0;
+				g_MapReader.PushBloodPixels ();
+				GameObject.Find("CurrentInfected").GetComponent<Text>().text= CountOfInfected + " Infected";
 			}
 		}
     }
@@ -244,7 +247,8 @@ public class ColorChange : MonoBehaviour
                 CountOfInfected += 1;
                 CountOfCivilians -= 1;
 
-                GameObject.Find("CurrentInfected").GetComponent<Text>().text= CountOfInfected + " Infected";
+				//g_MapReader.AddBloodSplat (Target.transform.position, 6, 20);
+				g_MapReader.AddBloodSplat (Target.transform.position, 3, 10);
 
                 m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed - m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus, m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed + m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus); 
 				//GameObject.Instantiate (m_BloodSplat).transform.position = Target.transform.position;
@@ -496,9 +500,9 @@ public class ColorChange : MonoBehaviour
             SoundManager(objects[randomCivilian]);
 
             m_InitialActiveZombies += 1;
+			CountOfInfected += m_InitialActiveZombies;
             m_TimeBeforeSpawn += UnityEngine.Random.Range(2, 5);
 
-            CountOfInfected += m_InitialActiveZombies;
             GameObject.Find("CurrentInfected").GetComponent<Text>().text = CountOfInfected + " Infected";
             if (m_InitialActiveZombies == m_DifficultyParameters[m_DifficultyCurrentLevel].m_NumberOfZombies) { m_InitialInfectionDone = true; }
         }
