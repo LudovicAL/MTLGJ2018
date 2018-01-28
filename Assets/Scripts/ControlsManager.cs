@@ -65,7 +65,7 @@ public class ControlsManager : MonoBehaviour {
 				}
 			} else {	//ON PC
 				MouseClickController();
-				KeyboardButtonController ();
+				//KeyboardButtonController ();
 
 			}
 			if (coordList.Count > 100) {

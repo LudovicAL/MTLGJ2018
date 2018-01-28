@@ -156,7 +156,7 @@ public class ColorChange : MonoBehaviour
 			if (m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame) {
 				m_InfectedIndex = 0;
 				g_MapReader.PushBloodPixels ();
-				m_InfectedCountText.text="Living:" + CountOfCivilians + " Infected:"+ CountOfInfected + " Dead:" + DeadInfected;
+				m_InfectedCountText.text = CountOfInfected - DeadInfected + " Infected";
 			}
 		}
     }
