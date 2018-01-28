@@ -99,18 +99,21 @@ public class MapReader : MonoBehaviour {
 		for (int i = 1; i < _wallCoords.Count; ++i) {
 			Vector2 wallCoordA = _wallCoords [i-1];
 			Vector2 wallCoordB = _wallCoords [i];
+
+
 			int[] pixelCoordA = ConvertWorldCoordToPixelCoord (wallCoordA [0], wallCoordA [1]);
 			int[] pixelCoordB = ConvertWorldCoordToPixelCoord (wallCoordB [0], wallCoordB [1]);
+			MakeWallBetweenPoints_Bresenham (pixelCoordA, pixelCoordB);
 
 			//bool wasAWall = m_Bitmap [pixelCoord [0], pixelCoord [1]] == false;
 			//if (wasAWall) break into smaller walls
 			//m_Bitmap [pixelCoord [0], pixelCoord [1]] = false; // update unwalkable
 
-			Debug.DrawLine(_wallCoords[i-1], _wallCoords[i]);
+			//Debug.DrawLine(_wallCoords[i-1], _wallCoords[i]);
 			//Debug.Log ("wall coords: " + _wallCoords[i-1].ToString("F4") + ", " + _wallCoords[i].ToString("F4"));
 
 			//Debug.Log ("pixel coords: (" + pixelCoordA[0] + ", " + pixelCoordA[1] + "), (" + pixelCoordB[0] + ", " + pixelCoordB[1] + ")");
-			MakeWallBetweenPoints_Bresenham (pixelCoordA, pixelCoordB);
+
 		}
 	}
 
