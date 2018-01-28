@@ -286,6 +286,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Civilian: {fileID: 696286678}
+  m_BloodSplat: {fileID: 1401428525952386, guid: 935770f328fb3bd4ea19562c6607234e,
+    type: 2}
 --- !u!4 &1285711542
 Transform:
   m_ObjectHideFlags: 0

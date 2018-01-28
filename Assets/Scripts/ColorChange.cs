@@ -204,8 +204,12 @@ public class ColorChange : MonoBehaviour
 
 		if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= m_ZombieConversionRange)
         {
-            Target.tag = "Infected";
-			m_HumanSpeeds[HumanIndex] = UnityEngine.Random.Range(InfectedBaseSpeed - InfectedSpeedPlusMinus, InfectedBaseSpeed + InfectedSpeedPlusMinus); 
+			if (Target.tag != "Infected") {
+				Target.tag = "Infected";
+				m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (InfectedBaseSpeed - InfectedSpeedPlusMinus, InfectedBaseSpeed + InfectedSpeedPlusMinus); 
+				//GameObject.Instantiate (m_BloodSplat).transform.position = Target.transform.position;
+				//Do this in the texture. AURELIE! HERE! <3
+			}
         }
         else
         {
