@@ -532,7 +532,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 338ce51d7f94bfc46904bfb39507fe97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MapTexture: {fileID: 2800000, guid: bc577618475006048bf93263b0ac3f83, type: 3}
 --- !u!1 &1624716158
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,7 +541,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1624716161}
   - component: {fileID: 1624716160}
-  - component: {fileID: 1624716159}
   m_Layer: 0
   m_Name: BlankMapForWalls
   m_TagString: Untagged
@@ -550,18 +548,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1624716159
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1624716158}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 338ce51d7f94bfc46904bfb39507fe97, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MapTexture: {fileID: 2800000, guid: 0c5e04ffe8723bd41a89cd80bc6aa98c, type: 3}
 --- !u!212 &1624716160
 SpriteRenderer:
   m_ObjectHideFlags: 0

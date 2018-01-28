@@ -23,6 +23,7 @@ public class ControlsManager : MonoBehaviour {
 	private bool movingScreen;
 	private GameStatesManager gameStatesManager;	//Refers to the GameStateManager
 	private StaticData.AvailableGameStates gameState;	//Mimics the GameStateManager's gameState variable at all time
+	GameObject m_MapReaderObject;
 
 	// Use this for initialization
 	void Start () {
@@ -43,7 +44,9 @@ public class ControlsManager : MonoBehaviour {
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
 		gameStatesManager.PlayingGameState.AddListener(OnPlaying);
 		gameStatesManager.PausedGameState.AddListener(OnPausing);
+		gameStatesManager.PausedGameState.AddListener(OnEnding);
 		SetState (gameStatesManager.gameState);
+		m_MapReaderObject = GameObject.Find ("Map");
 	}
 	
 	// Update is called once per frame
@@ -226,37 +229,62 @@ public class ControlsManager : MonoBehaviour {
 		movingScreen = false;
 	}
 
+	//m_MapReaderObject
+
+	private bool m_WallStarted = false;
+	private bool m_WallBuilding = false;
+
 	//Player began tracing a wall in the current frame
 	private void WallBegan(Vector2 coord) {
-		buildingWall = true;
-		coordList.Add(Camera.main.ScreenToWorldPoint(coord));
-		nextUpdateTime = Time.time + updateGap;
-		hollowLine.positionCount = 1;
-		hollowLine.SetPosition (0, Camera.main.ScreenToWorldPoint (coord));
+		m_WallStarted = true;
+		m_WallBuilding = false;
+		hollowLine.positionCount = 0;
 		hollowLine.enabled = true;
+	}
+
+
+	private bool TryAddWallCoordinate(Vector2 coord)
+	{
+		Vector3 convertedCoord = Camera.main.ScreenToWorldPoint (coord);
+		convertedCoord.z = 0;
+
+		coordList.Add(convertedCoord);
+		nextUpdateTime = Time.time + updateGap;
+		++hollowLine.positionCount;
+		hollowLine.SetPosition (hollowLine.positionCount - 1, convertedCoord);
+
+
+		return true;
 	}
 
 	//Player kept tracing a wall in the current frame
 	private void WallMoved(Vector2 coord) {
-		if (buildingWall) {
-			if (Time.time > nextUpdateTime) {
-				Vector3 convertedCoord = Camera.main.ScreenToWorldPoint (coord);
-				convertedCoord.z = 0;
-				coordList.Add(convertedCoord);
-				nextUpdateTime = Time.time + updateGap;
-				hollowLine.positionCount = hollowLine.positionCount + 1;
-				hollowLine.SetPosition (hollowLine.positionCount - 1, convertedCoord);
+		if (m_WallStarted) 
+		{
+			if (!m_WallBuilding) 
+			{
+				if (TryAddWallCoordinate (coord)) 
+				{
+					m_WallBuilding = true;
+				}
+			} 
+			else 
+			{
+				if (Time.time > nextUpdateTime) 
+				{
+					TryAddWallCoordinate (coord);
+				}
 			}
 		}
 	}
 
 	//Player stopped tracing a wall in the current frame
 	private void WallEnded(Vector2 coord) {
-		if (buildingWall) {
+		//if (buildingWall) {
 			coordList.Add(Camera.main.ScreenToWorldPoint(coord));
 			DrawWall ();
 			WallCanceled ();	//This is not actually cancelling the wall as it has been constructed already. It just resets the variables.
-		}
+		//}
 	}
 
 	//Player canceled his request to trace a wall in the current frame
@@ -271,11 +299,11 @@ public class ControlsManager : MonoBehaviour {
 
 	//A wall has to be drawn
 	private void DrawWall() {
-		GameObject mapReaderObject = GameObject.Find ("Map");
-		if (mapReaderObject == null) {
+		
+		if (m_MapReaderObject == null) {
 			return;
 		}
-		mapReaderObject.GetComponent<MapReader> ().AddWall (coordList);
+		m_MapReaderObject.GetComponent<MapReader> ().AddWall (coordList);
 	}
 	
 	//Listener functions a defined for every GameState
@@ -295,6 +323,10 @@ public class ControlsManager : MonoBehaviour {
 
 	protected void OnPausing() {
 		SetState (StaticData.AvailableGameStates.Paused);
+	}
+
+	protected void OnEnding() {
+		SetState (StaticData.AvailableGameStates.Ending);
 	}
 
 	private void SetState(StaticData.AvailableGameStates state) {
