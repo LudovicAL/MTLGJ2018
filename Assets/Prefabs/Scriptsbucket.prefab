@@ -54,6 +54,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Civilian: {fileID: 0}
+  CountOfInfected: 0
+  StartingCivilians: 3000
+  Afraid: {fileID: 8300000, guid: 048035e85f78fc545986f210f9fda240, type: 3}
+  Moans: {fileID: 8300000, guid: 28bb4ec7917e6724a9752abd41bbd105, type: 3}
 --- !u!114 &114693374265573168
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -85,6 +89,11 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  EndingGameState:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
 --- !u!114 &114990470629987104
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -96,5 +105,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45e9ab635cb1786498eb7d0bb2328bd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wallConstructionMode: 0
   cameraSpeed: 1
+  zoomSpeed: 3
   updateGap: 0.02
+  fieldOfViewMin: 2
+  fieldOfViewMax: 20
