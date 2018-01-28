@@ -110,7 +110,6 @@ public class MapReader : MonoBehaviour {
 
 	public void AddWall(List<Vector2> _wallCoords)
 	{
-		Debug.Log ("NEW WALL");
 		for (int i = 1; i < _wallCoords.Count; ++i) {
 			Vector2 wallCoordA = _wallCoords [i-1];
 			Vector2 wallCoordB = _wallCoords [i];
