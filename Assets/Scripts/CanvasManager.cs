@@ -7,6 +7,7 @@ public class CanvasManager : MonoBehaviour {
 
 	public GameObject workerButtonPrefab;
 	public int numberOfWorkers = 3;
+	//private EndGame eg;
 	private GameObject panelGame;
 	private GameStatesManager gameStatesManager;	//Refers to the GameStateManager
 	private StaticData.AvailableGameStates gameState;	//Mimics the GameStateManager's gameState variable at all time
@@ -16,6 +17,7 @@ public class CanvasManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		//eg = GameObject.Find ("Scriptsbucket").GetComponent<EndGame>();
 		GameObject.Find ("Button Start").GetComponent<Button> ().onClick.AddListener (StartButtonPress);
 		GameObject.Find ("Button Quit").GetComponent<Button> ().onClick.AddListener (QuitButtonPress);
 		textCasualties = GameObject.Find ("Text Casualties").GetComponent<Text> ();
@@ -44,7 +46,11 @@ public class CanvasManager : MonoBehaviour {
 
 	private void showPanel(string panelName) {
 		for (int i = 0, max = this.transform.childCount; i < max; i++) {
-			this.transform.GetChild (i).gameObject.SetActive (this.transform.GetChild (i).gameObject.name == panelName);
+			if (this.transform.GetChild (i).gameObject.name == panelName || this.transform.GetChild (i).gameObject.name == "EventSystem") {
+				this.transform.GetChild (i).gameObject.SetActive (true);
+			} else {
+				this.transform.GetChild (i).gameObject.SetActive (false);
+			}
 		}
 	}
 
@@ -82,6 +88,7 @@ public class CanvasManager : MonoBehaviour {
 
 	protected void OnEnding() {
 		SetState (StaticData.AvailableGameStates.Ending);
+		ShowEndScreen ();
 	}
 
 	private void SetState(StaticData.AvailableGameStates state) {
@@ -93,10 +100,13 @@ public class CanvasManager : MonoBehaviour {
 		gameStatesManager.ChangeGameState (state);
 	}
 
-	public void ShowEndScreen(int casualties, int survivors) {
-		textCasualties.text = casualties.ToString ();
-		textSurvivors.text = survivors.ToString ();
-		float ratio = survivors / (casualties + survivors);
+	public void ShowEndScreen() {
+		/*
+		showPanel ("Panel End");
+		textCasualties.text = eg.m_NumberOfCasualties.ToString ();
+		textSurvivors.text = m_NumberOfCivilians.ToString ();
+		float ratio = m_NumberOfCivilians / (m_NumberOfCasualties + m_NumberOfCivilians);
 		textRatio.text = ratio.ToString ("0.0%");
+		*/
 	}
 }
