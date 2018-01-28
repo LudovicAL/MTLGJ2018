@@ -23,6 +23,7 @@ public class ColorChange : MonoBehaviour
 	float m_ZombieConversionRange = 0.05f;
     public int CountOfInfected;
     public int StartingCivilians = 3000;
+    public int CountOfCivilians;
 
     public AudioClip Afraid;
     public AudioClip Moans;
@@ -152,6 +153,7 @@ public class ColorChange : MonoBehaviour
             Color ActiveSpriteColor = ActiveSprite.color;
             ActiveSprite.color = new Color(0.0f, 0.0f, 0.0f, 0.40f);
             ActiveInfected.tag = "Dead";
+            CountOfInfected -= 1;
         }
         else
         {
@@ -221,6 +223,7 @@ public class ColorChange : MonoBehaviour
                 ActiveInfected.tag = "Eating";
                 Target.tag = "Infected";
                 CountOfInfected += 1;
+                CountOfCivilians -= 1;
                 m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (InfectedBaseSpeed - InfectedSpeedPlusMinus, InfectedBaseSpeed + InfectedSpeedPlusMinus); 
 				//GameObject.Instantiate (m_BloodSplat).transform.position = Target.transform.position;
 				//Do this in the texture. AURELIE! HERE! <3
