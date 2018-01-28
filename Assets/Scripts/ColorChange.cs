@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 public class ColorChange : MonoBehaviour
 {
@@ -248,7 +249,10 @@ public class ColorChange : MonoBehaviour
                 Target.tag = "Infected";
                 CountOfInfected += 1;
                 CountOfCivilians -= 1;
-				m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed - m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus, m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed + m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus); 
+
+                GameObject.Find("CurrentInfected").GetComponent<Text>().text= CountOfInfected + " Infected";
+
+                m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed - m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus, m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed + m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus); 
 				//GameObject.Instantiate (m_BloodSplat).transform.position = Target.transform.position;
 				//Do this in the texture. AURELIE! HERE! <3
 

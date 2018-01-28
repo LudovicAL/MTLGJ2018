@@ -11,7 +11,8 @@ public class CanvasManager : MonoBehaviour {
 	public Sprite spriteFreeWorker;
 	private EndGame eg;
 	private GameObject panelGame;
-	private GameObject scriptsBucketObject;
+    private GameObject panelWorker;
+    private GameObject scriptsBucketObject;
 	private GameStatesManager gameStatesManager;	//Refers to the GameStateManager
 	private StaticData.AvailableGameStates gameState;	//Mimics the GameStateManager's gameState variable at all time
 	private Text textCasualties;
@@ -32,7 +33,8 @@ public class CanvasManager : MonoBehaviour {
 		textSurvivors = GameObject.Find ("Text Survivors").GetComponent<Text> ();
 		textRatio = GameObject.Find ("Text Ratio").GetComponent<Text> ();
 		panelGame = GameObject.Find ("Panel Game");
-		gameStatesManager = GameObject.Find ("Scriptsbucket").GetComponent<GameStatesManager>();
+        panelWorker = GameObject.Find("Panel Worker");
+        gameStatesManager = GameObject.Find ("Scriptsbucket").GetComponent<GameStatesManager>();
 		gameStatesManager.MenuGameState.AddListener(OnMenu);
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
 		gameStatesManager.PlayingGameState.AddListener(OnPlaying);
@@ -42,7 +44,7 @@ public class CanvasManager : MonoBehaviour {
 		workerButtons = new List<GameObject> ();
 		for (int i = 0; i < numberOfWorkers; i++) {
 			int index = i;
-			GameObject newButton = GameObject.Instantiate (workerButtonPrefab, panelGame.transform);
+			GameObject newButton = Instantiate (workerButtonPrefab, panelWorker.transform);
 			newButton.GetComponent<Button> ().onClick.AddListener (delegate{WorkerButtonPress(index);});
 			workerButtons.Add (newButton);
 		}
@@ -88,7 +90,7 @@ public class CanvasManager : MonoBehaviour {
 			Transform backgroundImage = go.transform.Find ("BackgroundImage");
 			if (backgroundImage != null) {
 				Color updatedColor = _isInCameraMode ? Color.green : Color.yellow;
-				updatedColor.a = 0.78f; // alpha
+				updatedColor.a = 0.4f; // alpha
 				backgroundImage.GetComponent<Image> ().color = updatedColor;
 			}
 			Transform workerImage = go.transform.Find ("Image Worker");
