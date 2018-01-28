@@ -9,11 +9,12 @@ public class ExampleOfAScriptUsingGameStateManagement : MonoBehaviour {
 
 	//The scriptBucket and the listeners are initialized on Start()
 	void Start () {
-		gameStatesManager = GameObject.Find ("NameOfTheObjectContainingTheGameStateManager").GetComponent<GameStatesManager>();
+		gameStatesManager = GameObject.Find ("Scriptsbucket").GetComponent<GameStatesManager>();
 		gameStatesManager.MenuGameState.AddListener(OnMenu);
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
 		gameStatesManager.PlayingGameState.AddListener(OnPlaying);
 		gameStatesManager.PausedGameState.AddListener(OnPausing);
+		gameStatesManager.PausedGameState.AddListener(OnEnding);
 		SetState (gameStatesManager.gameState);
 	}
 		
@@ -41,6 +42,10 @@ public class ExampleOfAScriptUsingGameStateManagement : MonoBehaviour {
 
 	protected void OnPausing() {
 		SetState (StaticData.AvailableGameStates.Paused);
+	}
+
+	protected void OnEnding() {
+		SetState (StaticData.AvailableGameStates.Ending);
 	}
 
 	private void SetState(StaticData.AvailableGameStates state) {

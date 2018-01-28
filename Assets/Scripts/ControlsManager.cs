@@ -26,7 +26,6 @@ public class ControlsManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		Debug.Log ("Multitouch supported: " + Input.multiTouchEnabled);
 		distanceBetweenFingers = 0.0f;
 		wallConstructionMode = false;
 		nextUpdateTime = 0.0f;

@@ -11,6 +11,7 @@ public class GameStatesManager : MonoBehaviour {
 	public UnityEvent StartingGameState;
 	public UnityEvent PausedGameState;
 	public UnityEvent PlayingGameState;
+	public UnityEvent EndingGameState;
 	//The following variable contains the current GameState.
 	public StaticData.AvailableGameStates gameState { get; private set;}
 
@@ -27,6 +28,9 @@ public class GameStatesManager : MonoBehaviour {
 		}
 		if (PlayingGameState == null) {
 			PlayingGameState = new UnityEvent();
+		}
+		if (EndingGameState == null) {
+			EndingGameState = new UnityEvent();
 		}
 		ChangeGameState(StaticData.AvailableGameStates.Menu);
 	}
@@ -47,6 +51,9 @@ public class GameStatesManager : MonoBehaviour {
 			case StaticData.AvailableGameStates.Playing:
 				PlayingGameState.Invoke ();
 				break;
+			case StaticData.AvailableGameStates.Ending:
+				EndingGameState.Invoke ();
+				break;
 		}
 	}
 }
@@ -58,6 +65,7 @@ public static class StaticData {
 		Menu,	//Consulting the menu
 		Starting,	//Game is starting
 		Playing,	//Game is playing
-		Paused	//Game is paused
+		Paused,	//Game is paused
+		Ending //Game has ended
 	};
 }
