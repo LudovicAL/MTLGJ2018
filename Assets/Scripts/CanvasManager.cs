@@ -84,7 +84,9 @@ public class CanvasManager : MonoBehaviour {
 		foreach (GameObject go in workerButtons) {
 			Transform backgroundImage = go.transform.FindChild ("BackgroundImage");
 			if (backgroundImage != null) {
-				backgroundImage.GetComponent<Image> ().color = _isInCameraMode ? Color.green : Color.yellow;
+				Color updatedColor = _isInCameraMode ? Color.green : Color.yellow;
+				updatedColor.a = 0.78f; // alpha
+				backgroundImage.GetComponent<Image> ().color = updatedColor;
 			}
 			Transform workerImage = go.transform.FindChild ("Image Worker");
 			if (workerImage != null) {
