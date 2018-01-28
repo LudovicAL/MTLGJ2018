@@ -67,7 +67,10 @@ public class EndGame : MonoBehaviour {
     void Update()
     {
 		if (gameState == StaticData.AvailableGameStates.Playing) {
-	        if (colorChange.CountOfInfected == 0 || colorChange.CountOfCivilians <= colorChange.StartingCivilians*.01) {	
+	        if (colorChange.CountOfInfected == 0)
+
+            //|| colorChange.CountOfCivilians <= colorChange.StartingCivilians*.01) 
+            {	
 	            EndOfGame();
 	        }
 		}
