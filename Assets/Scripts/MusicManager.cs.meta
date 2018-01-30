@@ -1,11 +1,13 @@
 fileFormatVersion: 2
 guid: e2688cbd50e313846933016165b42a49
-timeCreated: 1517170767
+timeCreated: 1517262596
 licenseType: Free
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - Afraid: {fileID: 8300000, guid: 048035e85f78fc545986f210f9fda240, type: 3}
+  - Moans: {fileID: 8300000, guid: 28bb4ec7917e6724a9752abd41bbd105, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

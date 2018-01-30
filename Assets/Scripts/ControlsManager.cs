@@ -2,23 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class ControlsManager : MonoBehaviour {
 	public float cameraSpeed = 15.0f;
-	//public float updateGap = 0.02f;
 	private Vector3 m_PreviousPointerPosition;
-	//private 
 	private Renderer mapRenderer;
 	private Transform mapTransform;
-	private float distanceBetweenFingers;
 	private LineRenderer hollowLine;
 	private LineRenderer m_BadLine;
-	private float nextUpdateTime;
 	private Transform cameraTransform;
 	private List<Vector2> coordList;
-	private bool buildingWall;
-	private int screenWidth;
-	private int screenHeight;
 	private bool movingScreen;
 	private GameStatesManager gameStatesManager;	//Refers to the GameStateManager
 	private StaticData.AvailableGameStates gameState;	//Mimics the GameStateManager's gameState variable at all time
@@ -29,14 +23,9 @@ public class ControlsManager : MonoBehaviour {
 	void Start () {
 		mapRenderer = GameObject.Find ("Map").GetComponent<Renderer>();
 		mapTransform = GameObject.Find ("Map").transform;
-		distanceBetweenFingers = 0.0f;
-		nextUpdateTime = 0.0f;
 		cameraTransform = Camera.main.transform;
 		coordList = new List<Vector2> ();
-		buildingWall = false;
 		movingScreen = false;
-		screenWidth = Screen.width;
-		screenHeight = Screen.height;
 		isInCameraMode = true;
 		hollowLine = GameObject.Find("Line").GetComponent<LineRenderer>();
 		m_BadLine = GameObject.Find("BadLine").GetComponent<LineRenderer>();
@@ -65,7 +54,7 @@ public class ControlsManager : MonoBehaviour {
 				}
 			} else {	//ON PC
 				MouseClickController();
-				//KeyboardButtonController ();
+				KeyboardButtonController ();
 
 			}
 			if (coordList.Count > 100) {
@@ -106,7 +95,7 @@ public class ControlsManager : MonoBehaviour {
 			MoveCameraVertically(-Mathf.Sign(Input.GetAxis("Vertical")));
 		}
 		if (Input.GetButton("Cancel")) {
-			Application.LoadLevel(Application.loadedLevel);
+            SceneManager.LoadScene(0);
 		}
 	}
 
@@ -188,8 +177,6 @@ public class ControlsManager : MonoBehaviour {
 	private void MovingScreenMoved() {
 		if (movingScreen) {
 			MoveScreenMagically (Input.GetTouch (0).position);
-			//MoveCameraHorizontally (Mathf.Sign (Input.GetTouch(0).deltaPosition.x));
-			//MoveCameraVertically (Mathf.Sign (Input.GetTouch(0).deltaPosition.y));
 		}
 	}
 
@@ -322,8 +309,6 @@ public class ControlsManager : MonoBehaviour {
 	//Player canceled his request to trace a wall in the current frame
 	private void WallCanceled() {
 		coordList.Clear ();
-		nextUpdateTime = 0.0f;
-		buildingWall = false;
 		hollowLine.enabled = false;
 		hollowLine.positionCount = 0;
 		m_BadLine.enabled = false;

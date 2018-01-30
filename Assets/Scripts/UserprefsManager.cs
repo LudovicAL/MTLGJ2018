@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class UserprefsManager : MonoBehaviour {
-	private ColorChange cc;
+	private AIManager cc;
 
 	// Use this for initialization
 	void Awake () {
-		cc = GameObject.Find ("Scriptsbucket").GetComponent<ColorChange> ();
+		cc = GameObject.Find ("Scriptsbucket").GetComponent<AIManager> ();
 		cc.m_DifficultyCurrentLevel = PlayerPrefs.GetInt ("Difficulty");
 		PlayerPrefs.SetInt ("CurrentGameDifficulty", PlayerPrefs.GetInt("Difficulty"));
 		PlayerPrefs.SetInt ("Difficulty", 0);

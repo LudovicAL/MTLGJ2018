@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class CanvasManager : MonoBehaviour {
 
@@ -10,7 +11,6 @@ public class CanvasManager : MonoBehaviour {
 	public Sprite spriteBusyWorker;
 	public Sprite spriteFreeWorker;
 	private EndGame eg;
-	private GameObject panelGame;
     private GameObject panelWorker;
     private GameObject scriptsBucketObject;
 	private GameStatesManager gameStatesManager;	//Refers to the GameStateManager
@@ -32,7 +32,6 @@ public class CanvasManager : MonoBehaviour {
         textCasualties = GameObject.Find ("Text Casualties").GetComponent<Text> ();
 		textSurvivors = GameObject.Find ("Text Survivors").GetComponent<Text> ();
 		textRatio = GameObject.Find ("Text Ratio").GetComponent<Text> ();
-		panelGame = GameObject.Find ("Panel Game");
         panelWorker = GameObject.Find("Panel Worker");
         gameStatesManager = GameObject.Find ("Scriptsbucket").GetComponent<GameStatesManager>();
 		gameStatesManager.MenuGameState.AddListener(OnMenu);
@@ -48,7 +47,15 @@ public class CanvasManager : MonoBehaviour {
 			newButton.GetComponent<Button> ().onClick.AddListener (delegate{WorkerButtonPress(index);});
 			workerButtons.Add (newButton);
 		}
-		showPanel ("Panel Menu");
+        if (gameState == StaticData.AvailableGameStates.Playing)
+        {
+            showPanel("Panel Game");
+        }
+        else
+        {
+            showPanel("Panel Menu");
+        }
+        
 		scriptsBucketObject = GameObject.Find ("Scriptsbucket");
 		UpdateWorkerButtons (true);
 	}
@@ -59,7 +66,7 @@ public class CanvasManager : MonoBehaviour {
 	}
 
 	public void MenuButtonPress() {
-		Application.LoadLevel(Application.loadedLevel);
+		SceneManager.LoadScene(0);
 	}
 
 	private void showPanel(string panelName) {
@@ -109,8 +116,12 @@ public class CanvasManager : MonoBehaviour {
 
     public void ContinueButtonPress()
     {
-		GameObject.Find ("Scriptsbucket").GetComponent<UserprefsManager> ().IncrementDifficulty ();
-        Application.LoadLevel(Application.loadedLevel);
+        if (GameObject.Find("WhatsNext").tag != "Respawn")
+        {
+            GameObject.Find("Scriptsbucket").GetComponent<UserprefsManager>().IncrementDifficulty();
+        }
+        RequestGameStateChange(StaticData.AvailableGameStates.Playing);
+        SceneManager.LoadScene(0);
     }
 
     //Listener functions a defined for every GameState
@@ -170,6 +181,7 @@ public class CanvasManager : MonoBehaviour {
             GameObject.Find("Text Ratio").GetComponent<Text>().color = new Color(0.196f, 0.0078f, 0.0078f);
             GameObject.Find("WhatsNext").GetComponent<Text>().text = "Restart";
 			GameObject.Find("Text WinLose").GetComponent<Text>().text = "You lose";
+            GameObject.Find("WhatsNext").tag = "Respawn";
         }
     }
 }

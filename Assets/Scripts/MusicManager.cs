@@ -5,7 +5,9 @@ using UnityEngine;
 public class MusicManager : MonoBehaviour {
 
 	private AudioSource audioS;
-	private bool firstPass;
+    public AudioClip Afraid;
+    public AudioClip Moans;
+    private bool firstPass;
 
 	// Use this for initialization
 	void Start () {
@@ -24,4 +26,16 @@ public class MusicManager : MonoBehaviour {
 		yield return new WaitForSeconds (6);
 		audioS.Play ();
 	}
+
+    public void SoundManager(GameObject ActiveObject)
+    {
+        PlayMusic();
+        ActiveObject.AddComponent<AudioSource>();
+        audioS = ActiveObject.GetComponent<AudioSource>();
+        audioS.spatialBlend = 1;
+        audioS.rolloffMode = AudioRolloffMode.Linear;
+        audioS.minDistance = 9f;
+        audioS.maxDistance = 11f;
+        audioS.PlayOneShot(Afraid);
+    }
 }

@@ -301,6 +301,7 @@ GameObject:
   - component: {fileID: 1114069170}
   - component: {fileID: 1114069171}
   - component: {fileID: 1114069172}
+  - component: {fileID: 1114069173}
   m_Layer: 0
   m_Name: Scriptsbucket
   m_TagString: Untagged
@@ -324,13 +325,51 @@ MonoBehaviour:
   - {fileID: 2047670470}
   - {fileID: 1342854197}
   m_DifficultyCurrentLevel: 0
+  gameStatesManager: {fileID: 0}
+  gameState: 0
+  musicM: {fileID: 0}
+  GridList: []
+  CurrentColor:
+    r: 0
+    g: 0
+    b: 0
+    a: 0
+  NewColor:
+    r: 0
+    g: 0
+    b: 0
+    a: 0
+  Red: 0
+  Blue: 0
+  Green: 0
   Civilian: {fileID: 4152111572699614, guid: 3555833690c88814398fba0f4dcb1116, type: 2}
+  g_MapReader: {fileID: 0}
+  m_HasMapReader: 0
   CountOfInfected: 0
   DeadInfected: 0
   CountOfCivilians: 0
   Afraid: {fileID: 8300000, guid: 048035e85f78fc545986f210f9fda240, type: 3}
   Moans: {fileID: 8300000, guid: 28bb4ec7917e6724a9752abd41bbd105, type: 3}
+  Source: {fileID: 0}
+  m_MaxNumberOfInfectedToUpdateEachFrame: 100
+  m_InfectedIndex: 0
+  m_InfectedUpdatedThisFrame: 0
+  m_TimeBeforeSpawn: 0
+  m_InitialActiveZombies: 0
   m_InitialInfectionDone: 0
+  m_InfectedCountText: {fileID: 0}
+  m_RegTarget: 0.5
+  m_GridWidth: 18
+  m_GridHeight: 14
+  m_GridCellWidthHeight: 0.5
+  m_GridOffset: {x: 0, y: 0, z: 0}
+  m_Civilians: []
+  m_CivilianGridIndex: 
+  m_HumanSpeeds: []
+  m_HumanHealthIndex: []
+  m_HumanHeadings: []
+  m_InfectedTargets: []
+  m_GridsWithZombies: []
 --- !u!4 &1114069167
 Transform:
   m_ObjectHideFlags: 0
@@ -427,6 +466,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2688cbd50e313846933016165b42a49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Afraid: {fileID: 8300000, guid: 048035e85f78fc545986f210f9fda240, type: 3}
+  Moans: {fileID: 8300000, guid: 28bb4ec7917e6724a9752abd41bbd105, type: 3}
+--- !u!114 &1114069173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1114069165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5c433c60b3703d48997e2fae269f6de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_DifficultyParameters:
+  - {fileID: 794876153}
+  - {fileID: 2047670470}
+  - {fileID: 1342854197}
+  Civilian: {fileID: 4152111572699614, guid: 3555833690c88814398fba0f4dcb1116, type: 2}
+  m_DifficultyCurrentLevel: 0
+  CountOfInfected: 0
+  CountOfDead: 0
+  CountOfCivilians: 0
+  m_InitialInfectionDone: 0
 --- !u!114 &1342854197 stripped
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 114827122575977632, guid: bfdee95942888fa4489b09db9b746c26,
@@ -558,12 +620,12 @@ Prefab:
     - target: {fileID: 224741542352864180, guid: 853c9d5a5d7494145bc765fbb71f8c30,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 877
+      value: 620
       objectReference: {fileID: 0}
     - target: {fileID: 224741542352864180, guid: 853c9d5a5d7494145bc765fbb71f8c30,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: 522
+      value: 362.5
       objectReference: {fileID: 0}
     - target: {fileID: 224741542352864180, guid: 853c9d5a5d7494145bc765fbb71f8c30,
         type: 2}
@@ -744,7 +806,6 @@ GameObject:
   - component: {fileID: 1717725072}
   - component: {fileID: 1717725071}
   - component: {fileID: 1717725070}
-  - component: {fileID: 1717725074}
   - component: {fileID: 1717725075}
   m_Layer: 0
   m_Name: Main Camera
@@ -815,17 +876,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1717725074
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1717725069}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc09e8e9f6a96bd4eb7dfe78e2105119, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!82 &1717725075
 AudioSource:
   m_ObjectHideFlags: 0
@@ -893,7 +943,7 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
