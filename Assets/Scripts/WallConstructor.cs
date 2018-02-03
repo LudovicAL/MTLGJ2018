@@ -27,14 +27,6 @@ public class WallConstructor : MonoBehaviour {
 		m_WallFinished = false;
 		m_MapReaderObject = GameObject.Find ("Map");
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		if (coordList.Count > 100) {
-			WallEnded (Input.mousePosition);
-		}
-	}
-
 
 	public void WallBegan(Vector2 coord) {
 		m_WallStarted = true;
@@ -55,6 +47,10 @@ public class WallConstructor : MonoBehaviour {
 			++m_BadLine.positionCount;
 			m_BadLine.SetPosition (m_BadLine.positionCount - 1, convertedCoord);
 		}
+	}
+
+	public List<Vector2> getCoordList() {
+		return coordList;
 	}
 
 	//Player kept tracing a wall in the current frame

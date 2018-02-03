@@ -40,6 +40,9 @@ public class TouchControls : MonoBehaviour {
 					}
 				}
 			}
+			if (wallConstructor.getCoordList().Count > 100) {
+				wallConstructor.WallEnded (Input.GetTouch(0).position);
+			}
 		}
 	}
 

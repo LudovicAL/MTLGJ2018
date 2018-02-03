@@ -18,11 +18,6 @@ public class CameraController : MonoBehaviour {
 		mapTransform = GameObject.Find ("Map").transform;
 		mapRenderer = GameObject.Find ("Map").GetComponent<Renderer>();
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
 	public void set_m_PreviousPointerPosition(Vector3 v) {
 		m_PreviousPointerPosition = v;

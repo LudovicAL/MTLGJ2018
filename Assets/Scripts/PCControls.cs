@@ -32,6 +32,9 @@ public class PCControls : MonoBehaviour {
 		if (gameState == StaticData.AvailableGameStates.Playing) {
 			MouseClickController();
 			KeyboardButtonController ();
+			if (wallConstructor.getCoordList().Count > 100) {
+				wallConstructor.WallEnded (Input.mousePosition);
+			}
 		}
 	}
 
