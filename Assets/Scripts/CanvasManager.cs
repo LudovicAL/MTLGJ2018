@@ -80,10 +80,10 @@ public class CanvasManager : MonoBehaviour {
 	}
 
 	public void WorkerButtonPress(int buttonNo) {
-		ControlsManager controlsManager = scriptsBucketObject != null ? scriptsBucketObject.GetComponent<ControlsManager> () : null;
-		if (controlsManager != null) {
-			controlsManager.ToggleCameraMode ();
-			bool newIsInCameraMode = controlsManager.GetIsInCameraMode ();
+		CameraController cameraController = scriptsBucketObject != null ? scriptsBucketObject.GetComponent<CameraController> () : null;
+		if (cameraController != null) {
+			cameraController.ToggleCameraMode ();
+			bool newIsInCameraMode = cameraController.GetIsInCameraMode ();
 
 			// TODO: if we ever have more than one button, change only the one that gets changed
 			UpdateWorkerButtons(newIsInCameraMode);
