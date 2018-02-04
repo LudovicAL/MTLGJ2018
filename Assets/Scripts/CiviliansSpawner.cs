@@ -46,7 +46,7 @@ public class CiviliansSpawner : MonoBehaviour {
 		}
 	}
 
-	void BuildArrayOfCivilians() {
+	private void BuildArrayOfCivilians() {
 		arrayOfCivilians = GameObject.FindGameObjectsWithTag("Civilian");
 		int amountOfCivilians = arrayOfCivilians.Length;
 		civilianGridIndex = new int[amountOfCivilians];
