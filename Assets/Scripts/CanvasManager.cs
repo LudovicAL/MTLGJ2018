@@ -7,19 +7,32 @@ using UnityEngine.SceneManagement;
 public class CanvasManager : MonoBehaviour {
 
 	public GameObject workerButtonPrefab;
-	public int numberOfWorkers = 1;
+	public int numberOfWorkers = 0;
 	public Sprite spriteBusyWorker;
 	public Sprite spriteFreeWorker;
 	private EndGame eg;
-    private GameObject panelWorker;
+    public GameObject panelWorker;
     private GameObject scriptsBucketObject;
 	private GameStatesManager gameStatesManager;	//Refers to the GameStateManager
 	private StaticData.AvailableGameStates gameState;	//Mimics the GameStateManager's gameState variable at all time
 	private Text textCasualties;
 	private Text textSurvivors;
 	private Text textRatio;
-	private List<GameObject> workerButtons;
+	public List<GameObject> workerButtons;
     private float m_SuccessRatioNeeded = 0.3f;
+
+    void Awake()
+    {
+        panelWorker = GameObject.Find("Panel Worker");
+        workerButtons = new List<GameObject>();
+        for (int i = 0; i < numberOfWorkers; i++)
+        {
+            int index = i;
+            GameObject newButton = Instantiate(workerButtonPrefab, panelWorker.transform);
+            newButton.GetComponent<Button>().onClick.AddListener(delegate { WorkerButtonPress(index); });
+            workerButtons.Add(newButton);
+        }
+    }
 
     // Use this for initialization
     void Start () {
@@ -32,7 +45,7 @@ public class CanvasManager : MonoBehaviour {
         textCasualties = GameObject.Find ("Text Casualties").GetComponent<Text> ();
 		textSurvivors = GameObject.Find ("Text Survivors").GetComponent<Text> ();
 		textRatio = GameObject.Find ("Text Ratio").GetComponent<Text> ();
-        panelWorker = GameObject.Find("Panel Worker");
+        
         gameStatesManager = GameObject.Find ("Scriptsbucket").GetComponent<GameStatesManager>();
 		gameStatesManager.MenuGameState.AddListener(OnMenu);
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
@@ -40,13 +53,7 @@ public class CanvasManager : MonoBehaviour {
 		gameStatesManager.PausedGameState.AddListener(OnPausing);
 		gameStatesManager.EndingGameState.AddListener(OnEnding);
 		SetState (gameStatesManager.gameState);
-		workerButtons = new List<GameObject> ();
-		for (int i = 0; i < numberOfWorkers; i++) {
-			int index = i;
-			GameObject newButton = Instantiate (workerButtonPrefab, panelWorker.transform);
-			newButton.GetComponent<Button> ().onClick.AddListener (delegate{WorkerButtonPress(index);});
-			workerButtons.Add (newButton);
-		}
+		
         if (gameState == StaticData.AvailableGameStates.Playing)
         {
             showPanel("Panel Game");
@@ -62,7 +69,7 @@ public class CanvasManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+        
 	}
 
 	public void MenuButtonPress() {
@@ -90,10 +97,10 @@ public class CanvasManager : MonoBehaviour {
 		}
 	}
 
-	void UpdateWorkerButtons(bool _isInCameraMode)
+	public void UpdateWorkerButtons(bool _isInCameraMode)
 	{
-		foreach (GameObject go in workerButtons) {
-			Transform backgroundImage = go.transform.Find ("BackgroundImage");
+        foreach (GameObject go in workerButtons) {
+            Transform backgroundImage = go.transform.Find ("BackgroundImage");
 			if (backgroundImage != null) {
 				Color updatedColor = _isInCameraMode ? Color.green : Color.yellow;
 				updatedColor.a = 0.4f; // alpha
@@ -102,7 +109,7 @@ public class CanvasManager : MonoBehaviour {
 			Transform workerImage = go.transform.Find ("Image Worker");
 			if (workerImage != null) {
 				workerImage.GetComponent<Image> ().sprite = _isInCameraMode ? spriteFreeWorker : spriteBusyWorker;
-			}
+            }
 		}
 	}
 
@@ -183,5 +190,7 @@ public class CanvasManager : MonoBehaviour {
 			GameObject.Find("Text WinLose").GetComponent<Text>().text = "You lose";
             GameObject.Find("WhatsNext").tag = "Respawn";
         }
+        GameObject.Find("Text Diff").GetComponent<Text>().text = PlayerPrefs.GetInt("Difficulty").ToString();
+        GameObject.Find("Text Level").GetComponent<Text>().text = PlayerPrefs.GetInt("CurrentLevel").ToString();
     }
 }

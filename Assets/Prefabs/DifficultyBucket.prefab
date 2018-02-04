@@ -58,6 +58,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1550546918236394
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4511662798183010}
+  - component: {fileID: 114995612282424796}
+  m_Layer: 0
+  m_Name: Difficulty_4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1994831915801472
 GameObject:
   m_ObjectHideFlags: 0
@@ -87,6 +103,7 @@ Transform:
   - {fileID: 4774465900602604}
   - {fileID: 4606091039903538}
   - {fileID: 4396215207534172}
+  - {fileID: 4511662798183010}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -102,6 +119,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4290302507882998}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4511662798183010
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1550546918236394}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4290302507882998}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4606091039903538
 Transform:
@@ -185,6 +215,31 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1994831915801472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 288465fd2bbed0546a88dbb45787aaa7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsInitialized: 0
+  m_StartingHumans: 3000
+  InfectedBaseSpeed: 0.5
+  InfectedSpeedPlusMinus: 0.2
+  CivilianBaseSpeed: 0.1
+  CivilianSpeedPlusMinus: 0.05
+  m_ZombieConversionRange: 0.05
+  m_NumberOfZombies: 2
+  m_StartingZombieBoost: 2
+  m_CurrentZombieBoost: 0
+  m_ZombieBoostDegradeAmountPerNewZombie: 0.05
+  m_BaseEatingSpeed: 0.05
+  m_MaxTerrorIndex: 4
+  m_TerrorIndexIncreasePerZombie: 0.25
+--- !u!114 &114995612282424796
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1550546918236394}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 288465fd2bbed0546a88dbb45787aaa7, type: 3}

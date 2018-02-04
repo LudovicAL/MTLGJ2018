@@ -32,7 +32,7 @@ public class GameStatesManager : MonoBehaviour {
 		if (EndingGameState == null) {
 			EndingGameState = new UnityEvent();
 		}
-		if (PlayerPrefs.GetInt("Difficulty") == 0) {
+		if (PlayerPrefs.GetInt("Level") == 0) {
 			ChangeGameState(StaticData.AvailableGameStates.Menu);
 		} else {
 			ChangeGameState(StaticData.AvailableGameStates.Playing);

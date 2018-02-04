@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class ControlsManager : MonoBehaviour {
 	public float cameraSpeed = 15.0f;
@@ -17,7 +18,9 @@ public class ControlsManager : MonoBehaviour {
 	private GameStatesManager gameStatesManager;	//Refers to the GameStateManager
 	private StaticData.AvailableGameStates gameState;	//Mimics the GameStateManager's gameState variable at all time
 	private bool isInCameraMode; // vs WorkerMode
-	GameObject m_MapReaderObject;
+    private GameObject m_MapReaderObject;
+    private CanvasManager canvasManager;
+    private Image m_actionStatusBackground;
 
 	// Use this for initialization
 	void Start () {
@@ -30,33 +33,53 @@ public class ControlsManager : MonoBehaviour {
 		hollowLine = GameObject.Find("Line").GetComponent<LineRenderer>();
 		m_BadLine = GameObject.Find("BadLine").GetComponent<LineRenderer>();
 		gameStatesManager = GameObject.Find ("Scriptsbucket").GetComponent<GameStatesManager>();
-		gameStatesManager.MenuGameState.AddListener(OnMenu);
+        canvasManager = GameObject.Find("Canvas").GetComponent<CanvasManager>();
+        gameStatesManager.MenuGameState.AddListener(OnMenu);
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
 		gameStatesManager.PlayingGameState.AddListener(OnPlaying);
 		gameStatesManager.PausedGameState.AddListener(OnPausing);
 		gameStatesManager.EndingGameState.AddListener(OnEnding);
 		SetState (gameStatesManager.gameState);
 		m_MapReaderObject = GameObject.Find ("Map");
-	}
+        GameObject PW = canvasManager.panelWorker;
+        m_actionStatusBackground = PW.transform.Find("ActionStatus").GetComponent<Image>();
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
 		if (gameState == StaticData.AvailableGameStates.Playing) {
-			if (Application.isMobilePlatform) {	//ON MOBILE
+			//if (Application.isMobilePlatform) {	//ON MOBILE
 				if (Input.touchCount > 0) {	//USER HAS FINGER(S) ON
-					if (!isInCameraMode) {
-						TouchWallConstructionController ();
-					} else {
-						if (!EventSystem.current.IsPointerOverGameObject()) {
-							TouchScreenMoveController ();
-						}
-					}
-				}
-			} else {	//ON PC
-				MouseClickController();
-				KeyboardButtonController ();
 
-			}
+                    //if (!isInCameraMode) {
+                    if (Camera.main.orthographicSize <= 1.2f && Input.touchCount == 1)
+                    {
+                    
+                        TouchWallConstructionController ();
+					}
+                    else if (Input.touchCount == 2)
+                    {
+                        TouchCameraZoom();
+                        if (Camera.main.orthographicSize <= 1.2f)
+                        {
+                            UpdateActionStatus(false);
+                        }
+                        else
+                        {
+                            UpdateActionStatus(true);
+                        }
+                    }
+                    else //if (!EventSystem.current.IsPointerOverGameObject())
+                    {
+                    TouchScreenMoveController ();
+					}
+            }
+			//} else {	//ON PC
+			//	MouseClickController();
+			//	KeyboardButtonController ();
+
+			//}
 			if (coordList.Count > 100) {
 				WallEnded (Input.mousePosition);
 			}
@@ -367,4 +390,50 @@ public class ControlsManager : MonoBehaviour {
 	{
 		return isInCameraMode;
 	}
+
+    private float perspectiveZoomSpeed = 0.005f;        // The rate of change of the field of view in perspective mode.
+    private float orthoZoomSpeed = 0.005f;        // The rate of change of the orthographic size in orthographic mode.
+
+    private void TouchCameraZoom()
+    {
+        Touch touchZero = Input.GetTouch(0);
+        Touch touchOne = Input.GetTouch(1);
+
+        // Find the position in the previous frame of each touch.
+        Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+        Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+
+        // Find the magnitude of the vector (the distance) between the touches in each frame.
+        float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+        float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+
+        // Find the difference in the distances between each frame.
+        float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+
+        // If the camera is orthographic...
+        if (Camera.main.orthographic)
+        {
+            // ... change the orthographic size based on the change in distance between the touches.
+            Camera.main.orthographicSize += deltaMagnitudeDiff * orthoZoomSpeed;
+
+            // Make sure the orthographic size never drops below zero.
+            Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, .8f, 2f);
+        }
+        else
+        {
+            // Otherwise change the field of view based on the change in distance between the touches.
+            Camera.main.fieldOfView += deltaMagnitudeDiff * perspectiveZoomSpeed;
+
+            // Clamp the field of view to make sure it's between 0 and 180.
+            Camera.main.fieldOfView = Mathf.Clamp(Camera.main.fieldOfView, 0.1f, 179.9f);
+        }
+    }
+
+    void UpdateActionStatus(bool _isInCameraMode)
+    {
+        if (m_actionStatusBackground != null)
+        {
+            m_actionStatusBackground.sprite = _isInCameraMode ? canvasManager.spriteFreeWorker  : canvasManager.spriteBusyWorker;
+        }
+    }
 }
