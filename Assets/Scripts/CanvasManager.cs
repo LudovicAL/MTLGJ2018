@@ -7,7 +7,12 @@ using UnityEngine.SceneManagement;
 public class CanvasManager : MonoBehaviour {
 
 	public GameObject workerButtonPrefab;
+<<<<<<< HEAD
 	public int numberOfWorkers = 0;
+=======
+	private CiviliansSpawner civiliansSpawner;
+	public int numberOfWorkers = 1;
+>>>>>>> 0635cb5bd8203fb1985639d0772d9cccea7aaa33
 	public Sprite spriteBusyWorker;
 	public Sprite spriteFreeWorker;
 	private EndGame eg;
@@ -37,6 +42,7 @@ public class CanvasManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
 		eg = GameObject.Find ("Scriptsbucket").GetComponent<EndGame>();
+		civiliansSpawner = GameObject.Find ("Scriptsbucket").GetComponent<CiviliansSpawner>();
 		GameObject.Find ("Button Start").GetComponent<Button> ().onClick.AddListener (StartButtonPress);
 		GameObject.Find ("Button Quit").GetComponent<Button> ().onClick.AddListener (QuitButtonPress);
         GameObject.Find("Button Abandon").GetComponent<Button>().onClick.AddListener(QuitButtonPress);
@@ -87,10 +93,10 @@ public class CanvasManager : MonoBehaviour {
 	}
 
 	public void WorkerButtonPress(int buttonNo) {
-		ControlsManager controlsManager = scriptsBucketObject != null ? scriptsBucketObject.GetComponent<ControlsManager> () : null;
-		if (controlsManager != null) {
-			controlsManager.ToggleCameraMode ();
-			bool newIsInCameraMode = controlsManager.GetIsInCameraMode ();
+		CameraController cameraController = scriptsBucketObject != null ? scriptsBucketObject.GetComponent<CameraController> () : null;
+		if (cameraController != null) {
+			cameraController.ToggleCameraMode ();
+			bool newIsInCameraMode = cameraController.GetIsInCameraMode ();
 
 			// TODO: if we ever have more than one button, change only the one that gets changed
 			UpdateWorkerButtons(newIsInCameraMode);
@@ -114,6 +120,7 @@ public class CanvasManager : MonoBehaviour {
 	}
 
 	public void StartButtonPress() {
+		civiliansSpawner.SpawnCivilians ();
 		RequestGameStateChange(StaticData.AvailableGameStates.Playing);
 	}
 
@@ -139,7 +146,6 @@ public class CanvasManager : MonoBehaviour {
 
 	protected void OnStarting() {
 		SetState (StaticData.AvailableGameStates.Starting);
-
 	}
 
 	protected void OnPlaying() {

@@ -42,7 +42,7 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 11
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 0
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 8
+    serializedVersion: 9
     m_Resolution: 2
     m_BakeResolution: 40
     m_TextureWidth: 1024
@@ -77,17 +77,20 @@ LightmapSettings:
     m_PVRDirectSampleCount: 32
     m_PVRSampleCount: 500
     m_PVRBounces: 2
-    m_PVRFiltering: 0
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
     m_PVRFilteringMode: 1
     m_PVRCulling: 1
     m_PVRFilteringGaussRadiusDirect: 1
     m_PVRFilteringGaussRadiusIndirect: 5
     m_PVRFilteringGaussRadiusAO: 2
-    m_PVRFilteringAtrousColorSigma: 1
-    m_PVRFilteringAtrousNormalSigma: 1
-    m_PVRFilteringAtrousPositionSigma: 1
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ShowResolutionOverlay: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -107,13 +110,9 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
+    debug:
+      m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!114 &312394639 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114940104424494764, guid: bfdee95942888fa4489b09db9b746c26,
-    type: 2}
-  m_PrefabInternal: {fileID: 676340745}
-  m_Script: {fileID: 11500000, guid: 288465fd2bbed0546a88dbb45787aaa7, type: 3}
 --- !u!1001 &446223495
 Prefab:
   m_ObjectHideFlags: 0
@@ -258,6 +257,7 @@ SpriteRenderer:
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -273,6 +273,7 @@ SpriteRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -289,6 +290,8 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
 --- !u!4 &696286678
 Transform:
   m_ObjectHideFlags: 0
@@ -542,11 +545,11 @@ Camera:
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!4 &1253255355
 Transform:
   m_ObjectHideFlags: 0
@@ -560,12 +563,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1291000825 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114827122575977632, guid: bfdee95942888fa4489b09db9b746c26,
-    type: 2}
-  m_PrefabInternal: {fileID: 676340745}
-  m_Script: {fileID: 11500000, guid: 288465fd2bbed0546a88dbb45787aaa7, type: 3}
 --- !u!1001 &1319830057
 Prefab:
   m_ObjectHideFlags: 0
@@ -573,11 +570,6 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 114294750957264182, guid: 2538036ac9506644faec047d069145e8,
-        type: 2}
-      propertyPath: m_DifficultyParameters.Array.size
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 4807865382328062, guid: 2538036ac9506644faec047d069145e8, type: 2}
       propertyPath: m_LocalPosition.x
       value: 2.3766084
@@ -610,35 +602,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 114294750957264182, guid: 2538036ac9506644faec047d069145e8,
-        type: 2}
-      propertyPath: Civilian
-      value: 
-      objectReference: {fileID: 696286678}
-    - target: {fileID: 1798513221375364, guid: 2538036ac9506644faec047d069145e8, type: 2}
-      propertyPath: m_Name
-      value: Scriptsbucket
-      objectReference: {fileID: 0}
-    - target: {fileID: 114294750957264182, guid: 2538036ac9506644faec047d069145e8,
-        type: 2}
-      propertyPath: m_DifficultyParameters.Array.data[0].m_StartingHumans
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114294750957264182, guid: 2538036ac9506644faec047d069145e8,
-        type: 2}
-      propertyPath: m_DifficultyParameters.Array.data[0]
-      value: 
-      objectReference: {fileID: 1908967300}
-    - target: {fileID: 114294750957264182, guid: 2538036ac9506644faec047d069145e8,
-        type: 2}
-      propertyPath: m_DifficultyParameters.Array.data[1]
-      value: 
-      objectReference: {fileID: 312394639}
-    - target: {fileID: 114294750957264182, guid: 2538036ac9506644faec047d069145e8,
-        type: 2}
-      propertyPath: m_DifficultyParameters.Array.data[2]
-      value: 
-      objectReference: {fileID: 1291000825}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2538036ac9506644faec047d069145e8, type: 2}
   m_IsPrefabParent: 0
@@ -668,6 +631,7 @@ SpriteRenderer:
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -683,6 +647,7 @@ SpriteRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -699,6 +664,8 @@ SpriteRenderer:
   m_Size: {x: 8, y: 6}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
 --- !u!4 &1383214997
 Transform:
   m_ObjectHideFlags: 0
@@ -748,6 +715,7 @@ SpriteRenderer:
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -763,6 +731,7 @@ SpriteRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -779,6 +748,8 @@ SpriteRenderer:
   m_Size: {x: 8, y: 6}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
 --- !u!4 &1624716161
 Transform:
   m_ObjectHideFlags: 0
@@ -834,9 +805,3 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0a776863cf3c2fb45b917a9c308a9a33, type: 2}
   m_IsPrefabParent: 0
---- !u!114 &1908967300 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114129815793411750, guid: bfdee95942888fa4489b09db9b746c26,
-    type: 2}
-  m_PrefabInternal: {fileID: 676340745}
-  m_Script: {fileID: 11500000, guid: 288465fd2bbed0546a88dbb45787aaa7, type: 3}
