@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class CanvasManager : MonoBehaviour {
 
 	public GameObject workerButtonPrefab;
+	private CiviliansSpawner civiliansSpawner;
 	public int numberOfWorkers = 1;
 	public Sprite spriteBusyWorker;
 	public Sprite spriteFreeWorker;
@@ -24,6 +25,7 @@ public class CanvasManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
 		eg = GameObject.Find ("Scriptsbucket").GetComponent<EndGame>();
+		civiliansSpawner = GameObject.Find ("Scriptsbucket").GetComponent<CiviliansSpawner>();
 		GameObject.Find ("Button Start").GetComponent<Button> ().onClick.AddListener (StartButtonPress);
 		GameObject.Find ("Button Quit").GetComponent<Button> ().onClick.AddListener (QuitButtonPress);
         GameObject.Find("Button Abandon").GetComponent<Button>().onClick.AddListener(QuitButtonPress);
@@ -107,6 +109,7 @@ public class CanvasManager : MonoBehaviour {
 	}
 
 	public void StartButtonPress() {
+		civiliansSpawner.SpawnCivilians ();
 		RequestGameStateChange(StaticData.AvailableGameStates.Playing);
 	}
 
@@ -132,7 +135,6 @@ public class CanvasManager : MonoBehaviour {
 
 	protected void OnStarting() {
 		SetState (StaticData.AvailableGameStates.Starting);
-
 	}
 
 	protected void OnPlaying() {
