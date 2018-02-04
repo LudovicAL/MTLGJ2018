@@ -1,0 +1,27 @@
+diff a/Assets/Prefabs/Scriptsbucket.prefab b/Assets/Prefabs/Scriptsbucket.prefab	(rejected hunks)
+@@ -18,17 +18,25 @@
+    m_PrefabInternal: {fileID: 100100000}
+    serializedVersion: 5
+    m_Component:
+++<<<<<<< HEAD
+ +  - component: {fileID: 4806013136739048}
+ +  - component: {fileID: 114111399241651190}
+ +  - component: {fileID: 114560716014671054}
+ +  - component: {fileID: 114384059482514610}
+ +  - component: {fileID: 114916621711794206}
+ +  - component: {fileID: 114560248425307002}
+ +  - component: {fileID: 114707735022245208}
+ +  - component: {fileID: 114716798839071124}
+ +  - component: {fileID: 114963577180491446}
+ +  - component: {fileID: 114048714354445768}
+ +  - component: {fileID: 114292368817193154}
+++=======
++   - component: {fileID: 4807865382328062}
++   - component: {fileID: 114693374265573168}
++   - component: {fileID: 114990470629987104}
++   - component: {fileID: 114294750957264182}
++   - component: {fileID: 114268906547379192}
+++>>>>>>> parent of a51a0b8... Division du vieux ControlManager en 4 scripts: TouchControls, PCControls, CameraMover et WallConstructor
+    m_Layer: 0
+    m_Name: Scriptsbucket
+    m_TagString: Untagged

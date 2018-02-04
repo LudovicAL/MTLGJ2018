@@ -7,42 +7,23 @@ using UnityEngine.SceneManagement;
 public class CanvasManager : MonoBehaviour {
 
 	public GameObject workerButtonPrefab;
-<<<<<<< HEAD
-	public int numberOfWorkers = 0;
-=======
-	private CiviliansSpawner civiliansSpawner;
 	public int numberOfWorkers = 1;
->>>>>>> 0635cb5bd8203fb1985639d0772d9cccea7aaa33
 	public Sprite spriteBusyWorker;
 	public Sprite spriteFreeWorker;
 	private EndGame eg;
-    public GameObject panelWorker;
+    private GameObject panelWorker;
     private GameObject scriptsBucketObject;
 	private GameStatesManager gameStatesManager;	//Refers to the GameStateManager
 	private StaticData.AvailableGameStates gameState;	//Mimics the GameStateManager's gameState variable at all time
 	private Text textCasualties;
 	private Text textSurvivors;
 	private Text textRatio;
-	public List<GameObject> workerButtons;
+	private List<GameObject> workerButtons;
     private float m_SuccessRatioNeeded = 0.3f;
-
-    void Awake()
-    {
-        panelWorker = GameObject.Find("Panel Worker");
-        workerButtons = new List<GameObject>();
-        for (int i = 0; i < numberOfWorkers; i++)
-        {
-            int index = i;
-            GameObject newButton = Instantiate(workerButtonPrefab, panelWorker.transform);
-            newButton.GetComponent<Button>().onClick.AddListener(delegate { WorkerButtonPress(index); });
-            workerButtons.Add(newButton);
-        }
-    }
 
     // Use this for initialization
     void Start () {
 		eg = GameObject.Find ("Scriptsbucket").GetComponent<EndGame>();
-		civiliansSpawner = GameObject.Find ("Scriptsbucket").GetComponent<CiviliansSpawner>();
 		GameObject.Find ("Button Start").GetComponent<Button> ().onClick.AddListener (StartButtonPress);
 		GameObject.Find ("Button Quit").GetComponent<Button> ().onClick.AddListener (QuitButtonPress);
         GameObject.Find("Button Abandon").GetComponent<Button>().onClick.AddListener(QuitButtonPress);
@@ -51,7 +32,7 @@ public class CanvasManager : MonoBehaviour {
         textCasualties = GameObject.Find ("Text Casualties").GetComponent<Text> ();
 		textSurvivors = GameObject.Find ("Text Survivors").GetComponent<Text> ();
 		textRatio = GameObject.Find ("Text Ratio").GetComponent<Text> ();
-        
+        panelWorker = GameObject.Find("Panel Worker");
         gameStatesManager = GameObject.Find ("Scriptsbucket").GetComponent<GameStatesManager>();
 		gameStatesManager.MenuGameState.AddListener(OnMenu);
 		gameStatesManager.StartingGameState.AddListener(OnStarting);
@@ -59,7 +40,13 @@ public class CanvasManager : MonoBehaviour {
 		gameStatesManager.PausedGameState.AddListener(OnPausing);
 		gameStatesManager.EndingGameState.AddListener(OnEnding);
 		SetState (gameStatesManager.gameState);
-		
+		workerButtons = new List<GameObject> ();
+		for (int i = 0; i < numberOfWorkers; i++) {
+			int index = i;
+			GameObject newButton = Instantiate (workerButtonPrefab, panelWorker.transform);
+			newButton.GetComponent<Button> ().onClick.AddListener (delegate{WorkerButtonPress(index);});
+			workerButtons.Add (newButton);
+		}
         if (gameState == StaticData.AvailableGameStates.Playing)
         {
             showPanel("Panel Game");
@@ -75,7 +62,7 @@ public class CanvasManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        
+		
 	}
 
 	public void MenuButtonPress() {
@@ -93,20 +80,20 @@ public class CanvasManager : MonoBehaviour {
 	}
 
 	public void WorkerButtonPress(int buttonNo) {
-		CameraController cameraController = scriptsBucketObject != null ? scriptsBucketObject.GetComponent<CameraController> () : null;
-		if (cameraController != null) {
-			cameraController.ToggleCameraMode ();
-			bool newIsInCameraMode = cameraController.GetIsInCameraMode ();
+		ControlsManager controlsManager = scriptsBucketObject != null ? scriptsBucketObject.GetComponent<ControlsManager> () : null;
+		if (controlsManager != null) {
+			controlsManager.ToggleCameraMode ();
+			bool newIsInCameraMode = controlsManager.GetIsInCameraMode ();
 
 			// TODO: if we ever have more than one button, change only the one that gets changed
 			UpdateWorkerButtons(newIsInCameraMode);
 		}
 	}
 
-	public void UpdateWorkerButtons(bool _isInCameraMode)
+	void UpdateWorkerButtons(bool _isInCameraMode)
 	{
-        foreach (GameObject go in workerButtons) {
-            Transform backgroundImage = go.transform.Find ("BackgroundImage");
+		foreach (GameObject go in workerButtons) {
+			Transform backgroundImage = go.transform.Find ("BackgroundImage");
 			if (backgroundImage != null) {
 				Color updatedColor = _isInCameraMode ? Color.green : Color.yellow;
 				updatedColor.a = 0.4f; // alpha
@@ -115,12 +102,11 @@ public class CanvasManager : MonoBehaviour {
 			Transform workerImage = go.transform.Find ("Image Worker");
 			if (workerImage != null) {
 				workerImage.GetComponent<Image> ().sprite = _isInCameraMode ? spriteFreeWorker : spriteBusyWorker;
-            }
+			}
 		}
 	}
 
 	public void StartButtonPress() {
-		civiliansSpawner.SpawnCivilians ();
 		RequestGameStateChange(StaticData.AvailableGameStates.Playing);
 	}
 
@@ -146,6 +132,7 @@ public class CanvasManager : MonoBehaviour {
 
 	protected void OnStarting() {
 		SetState (StaticData.AvailableGameStates.Starting);
+
 	}
 
 	protected void OnPlaying() {
@@ -196,7 +183,5 @@ public class CanvasManager : MonoBehaviour {
 			GameObject.Find("Text WinLose").GetComponent<Text>().text = "You lose";
             GameObject.Find("WhatsNext").tag = "Respawn";
         }
-        GameObject.Find("Text Diff").GetComponent<Text>().text = PlayerPrefs.GetInt("Difficulty").ToString();
-        GameObject.Find("Text Level").GetComponent<Text>().text = PlayerPrefs.GetInt("CurrentLevel").ToString();
     }
 }
