@@ -6,9 +6,9 @@ using UnityEngine.UI;
 
 public class AIManager : MonoBehaviour
 {
-	public List<DifficultyParameters> m_DifficultyParameters;
+    //public List<DifficultyParameters> m_DifficultyParameters;
     public Transform Civilian;
-    public int m_DifficultyCurrentLevel = 0;
+    //public int m_DifficultyCurrentLevel;
     public int m_CountOfInfected;
     public int m_CountOfDead;
     public int m_CountOfCivilians;
@@ -16,8 +16,8 @@ public class AIManager : MonoBehaviour
     public int m_StartingHumans;
 
     private GameStatesManager gameStatesManager;
-	private StaticData.AvailableGameStates gameState;
-	private MusicManager musicM;
+    private StaticData.AvailableGameStates gameState;
+    private MusicManager musicM;
     private MapReader g_MapReader;
     private Text m_InfectedCountText;
     private bool m_HasMapReader = false;
@@ -43,132 +43,142 @@ public class AIManager : MonoBehaviour
     private int m_InitialActiveZombies;
     private int[] m_CivilianGridIndex;
     private bool[] m_GridsWithZombies;
+    private bool m_initializeMap;
+    private DifficultyParameters m_DifficultyParameters;
 
     void Awake()
-	{
-		m_InfectedCountText = GameObject.Find ("CurrentInfected").GetComponent<Text> ();
-	}
+    {
+        m_DifficultyParameters = GameObject.Find("Scriptsbucket").GetComponent<DifficultyParameters>();
+        m_InfectedCountText = GameObject.Find("CurrentInfected").GetComponent<Text>();
+        gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
+        musicM = GameObject.Find("Scriptsbucket").GetComponent<MusicManager>();
+
+    }
 
     void Start()
     {
-			musicM = GameObject.Find("Scriptsbucket").GetComponent<MusicManager>();   
-            gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
+        gameStatesManager.MenuGameState.AddListener(OnMenu);
+        gameStatesManager.StartingGameState.AddListener(OnStarting);
+        gameStatesManager.PlayingGameState.AddListener(OnPlaying);
+        gameStatesManager.PausedGameState.AddListener(OnPausing);
+        gameStatesManager.EndingGameState.AddListener(OnEnding);
+        SetState(gameStatesManager.gameState);
 
-            gameStatesManager.MenuGameState.AddListener(OnMenu);
-            gameStatesManager.StartingGameState.AddListener(OnStarting);
-            gameStatesManager.PlayingGameState.AddListener(OnPlaying);
-            gameStatesManager.PausedGameState.AddListener(OnPausing);
-            gameStatesManager.EndingGameState.AddListener(OnEnding);
-            SetState(gameStatesManager.gameState);
 
-            m_TimeBeforeSpawn = UnityEngine.Random.Range(2, 5);
-            m_GridOffset = -1.0f * new Vector3((m_GridWidth * 0.5f * m_GridCellWidthHeight), (m_GridHeight * 0.5f * m_GridCellWidthHeight), 0.0f);
-            m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost = m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingZombieBoost;
-            m_CountOfCivilians = m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingHumans;
-
-            float yAxis = Civilian.position.y;
-            float xAxis = Civilian.position.x;
-            m_StartingHumans = m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingHumans;
-           
-            if (GameObject.Find("Map") != null)
-            {
-                g_MapReader = GameObject.Find("Map").GetComponent<MapReader>();
-                m_HasMapReader = true;
-            }
-
-            for (int i = 0; i < m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingHumans; i++)
-            {
-                if (g_MapReader != null)
-                { 
-                    float[] randomSpawnPos = g_MapReader.FindRandomWhiteSpace();
-                    xAxis = randomSpawnPos[0];
-                    yAxis = randomSpawnPos[1];
-                }
-                Instantiate(Civilian, new Vector3(xAxis, yAxis, 0), Quaternion.identity);
-            }
-
-            BuildInitialListOfCivilians();
-            SetupGameObjectGridList();
     }
 
     void Update()
     {
-		if (gameState == StaticData.AvailableGameStates.Playing) {
-			//DrawDebugGrid();
-	        UpdateCivilianGameObjectLists();
-			m_InfectedUpdatedThisFrame = 0;
-            //int amountOfCivilians = m_Civilians.Length;
+
+        if (gameState == StaticData.AvailableGameStates.Playing)
+        {
+            if (!m_initializeMap)
+            {
+                GameObject.Find("CurrentDifficulty").GetComponent<Text>().text = "Difficulty " + PlayerPrefs.GetInt("Difficulty", 0).ToString() + "." + PlayerPrefs.GetInt("CurrentLevel").ToString();
+
+                m_TimeBeforeSpawn = UnityEngine.Random.Range(2, 5);
+                m_GridOffset = -1.0f * new Vector3((m_GridWidth * 0.5f * m_GridCellWidthHeight), (m_GridHeight * 0.5f * m_GridCellWidthHeight), 0.0f);
+                m_DifficultyParameters.m_CurrentZombieBoost = m_DifficultyParameters.m_StartingZombieBoost;
+                m_CountOfCivilians = m_DifficultyParameters.m_StartingHumans;
+
+                float yAxis = Civilian.position.y;
+                float xAxis = Civilian.position.x;
+                m_StartingHumans = m_DifficultyParameters.m_StartingHumans;
+
+                if (GameObject.Find("Map") != null)
+                {
+                    g_MapReader = GameObject.Find("Map").GetComponent<MapReader>();
+                    m_HasMapReader = true;
+                }
+
+                for (int i = 0; i < m_StartingHumans; i++)
+                {
+                    if (g_MapReader != null)
+                    {
+                        float[] randomSpawnPos = g_MapReader.FindRandomWhiteSpace();
+                        xAxis = randomSpawnPos[0];
+                        yAxis = randomSpawnPos[1];
+                    }
+                    Instantiate(Civilian, new Vector3(xAxis, yAxis, 0), Quaternion.identity);
+                }
+
+                BuildInitialListOfCivilians();
+                SetupGameObjectGridList();
+                m_initializeMap = true;
+            }
+
+            UpdateCivilianGameObjectLists();
+            m_InfectedUpdatedThisFrame = 0;
             int amountOfCivilians = m_Civilians.Length;
 
             if (!m_InitialInfectionDone) { InitialInfection(); }
 
             for (int i = 0; i < amountOfCivilians; ++i)
-	        {
-
-                    switch (m_Civilians[i].tag)
-                    {
-                        case "Eating":
-                            ZombieDecay(m_Civilians[i], i, -m_DifficultyParameters[m_DifficultyCurrentLevel].m_BaseEatingSpeed * m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost);
-                            if (!IsHungry(m_Civilians[i]))
-                            {
-                                m_Civilians[i].tag = "Infected";
-                            }
-                            break;
-                        case "Dead":
-
-                            //Do Nothing
-                            break;
-                        case "Civilian":
-                            MoveHumanRandomly(m_Civilians[i], i, 0.3f);
-                            break;
-                        case "Infected":
-                            ZombieDecay(m_Civilians[i], i, 0.025f);
-
-                            if (i > m_InfectedIndex && m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame)
-                            {
-                                bool diedInWall = false;
-                                Vector3 infectedPos = m_Civilians[i].transform.position;
-                                if (!CanMove(infectedPos))
-                                {
-                                    //ZombieDied (m_Civilians [i], m_Civilians [i].GetComponent<SpriteRenderer>());
-                                    ZombieDied(m_Civilians[i], m_Civilians[i].GetComponent<SpriteRenderer>(), i);
-                                    diedInWall = true;
-                                }
-
-                                ++m_InfectedUpdatedThisFrame;
-                                m_InfectedIndex = i;
-
-                                if (diedInWall)
-                                    break;
-
-                                GetClosestCivilian(m_Civilians[i], i);
-                            }
-
-                            if (IsHungry(m_Civilians[i]))
-                            {
-                                if (m_InfectedTargets[i] != null)
-                                {
-                                    RushCivilian(m_Civilians[i], m_InfectedTargets[i], i);
-                                }
-                                else
-                                {
-                                    MoveHumanRandomly(m_Civilians[i], i, 0.5f);
-                                }
-                            }
-
-                            break;
-                    }
-                
-	        }
-
-           
-
-			if (m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame)
             {
-				m_InfectedIndex = 0;
-				g_MapReader.PushBloodPixels ();
-				m_InfectedCountText.text = m_CountOfInfected - m_CountOfDead + " Infected";
-			
+
+                switch (m_Civilians[i].tag)
+                {
+                    case "Eating":
+                        ZombieDecay(m_Civilians[i], i, -m_DifficultyParameters.m_BaseEatingSpeed * m_DifficultyParameters.m_CurrentZombieBoost);
+                        if (!IsHungry(m_Civilians[i]))
+                        {
+                            m_Civilians[i].tag = "Infected";
+                        }
+                        break;
+                    case "Dead":
+
+                        //Do Nothing
+                        break;
+                    case "Civilian":
+                        MoveHumanRandomly(m_Civilians[i], i, 0.3f);
+                        break;
+                    case "Infected":
+                        ZombieDecay(m_Civilians[i], i, 0.025f);
+
+                        if (i > m_InfectedIndex && m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame)
+                        {
+                            bool diedInWall = false;
+                            Vector3 infectedPos = m_Civilians[i].transform.position;
+                            if (!CanMove(infectedPos))
+                            {
+                                ZombieDied(m_Civilians[i], m_Civilians[i].GetComponent<SpriteRenderer>(), i);
+                                diedInWall = true;
+                            }
+
+                            ++m_InfectedUpdatedThisFrame;
+                            m_InfectedIndex = i;
+
+                            if (diedInWall)
+                                break;
+
+                            GetClosestCivilian(m_Civilians[i], i);
+                        }
+
+                        if (IsHungry(m_Civilians[i]))
+                        {
+                            if (m_InfectedTargets[i] != null)
+                            {
+                                RushCivilian(m_Civilians[i], m_InfectedTargets[i], i);
+                            }
+                            else
+                            {
+                                MoveHumanRandomly(m_Civilians[i], i, 0.5f);
+                            }
+                        }
+
+                        break;
+                }
+
+            }
+
+
+
+            if (m_InfectedUpdatedThisFrame < m_MaxNumberOfInfectedToUpdateEachFrame)
+            {
+                m_InfectedIndex = 0;
+                g_MapReader.PushBloodPixels();
+                m_InfectedCountText.text = m_CountOfInfected - m_CountOfDead + " Infected";
+
             }
         }
     }
@@ -177,7 +187,7 @@ public class AIManager : MonoBehaviour
     {
         SpriteRenderer ActiveSprite;
         ActiveSprite = ActiveInfected.transform.GetComponent<SpriteRenderer>();
-        
+
         float BlueTarget = .01f;
         float InfectionRate = .04f;
         Color NewColor;
@@ -187,7 +197,6 @@ public class AIManager : MonoBehaviour
 
         if (ActiveSprite.color.g <= 0.0f)
         {
-			//ZombieDied (ActiveInfected, ActiveSprite);
             ZombieDied(ActiveInfected, ActiveSprite, humanIndex);
         }
         else
@@ -199,8 +208,8 @@ public class AIManager : MonoBehaviour
             }
             else
             {
-				Green = ActiveSprite.color.g + InfectionRate * m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost * Time.deltaTime;
-				Red = ActiveSprite.color.r - InfectionRate * m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost * Time.deltaTime;
+                Green = ActiveSprite.color.g + InfectionRate * m_DifficultyParameters.m_CurrentZombieBoost * Time.deltaTime;
+                Red = ActiveSprite.color.r - InfectionRate * m_DifficultyParameters.m_CurrentZombieBoost * Time.deltaTime;
             }
 
             if (Blue <= BlueTarget)
@@ -217,153 +226,155 @@ public class AIManager : MonoBehaviour
             NewColor = new Color(Red, Green, Blue);
             ActiveSprite.color = NewColor;
         }
-		m_HumanHealthIndex [humanIndex] = ActiveSprite.color.r * 2.0f; //Hooray hacks!
+        m_HumanHealthIndex[humanIndex] = ActiveSprite.color.r * 2.0f; //Hooray hacks!
     }
 
-    //void ZombieDied(GameObject DyingInfected, SpriteRenderer ZombieRenderer)
     void ZombieDied(GameObject DyingInfected, SpriteRenderer ZombieRenderer, int i)
     {
-		Color ActiveSpriteColor = ZombieRenderer.color;
-		ZombieRenderer.color = new Color(0.0f, 0.0f, 0.0f, 0.40f);
-		DyingInfected.tag = "Dead";
+        Color ActiveSpriteColor = ZombieRenderer.color;
+        ZombieRenderer.color = new Color(0.0f, 0.0f, 0.0f, 0.40f);
+        DyingInfected.tag = "Dead";
 
         m_CountOfDead += 1;
-	}
+    }
 
     void GetClosestCivilian(GameObject ActiveInfected, int i)
     {
-            GameObject bestTarget = null;
-            float ClosestDist = Mathf.Infinity;
-            Vector3 currentPosition = ActiveInfected.transform.position;
+        GameObject bestTarget = null;
+        float ClosestDist = Mathf.Infinity;
+        Vector3 currentPosition = ActiveInfected.transform.position;
 
 
-            foreach (var obj in GameObjectGridList[m_CivilianGridIndex[i]])
+        foreach (var obj in GameObjectGridList[m_CivilianGridIndex[i]])
+        {
+            if (obj.tag == "Civilian")
             {
-                if (obj.tag == "Civilian")
+                float TargetDist = Vector3.Distance(currentPosition, obj.transform.position);
+                if (TargetDist < ClosestDist)
                 {
-                    float TargetDist = Vector3.Distance(currentPosition, obj.transform.position);
-                    if (TargetDist < ClosestDist)
-                    {
-                        ClosestDist = TargetDist;
-                        bestTarget = obj;
-                    }
+                    ClosestDist = TargetDist;
+                    bestTarget = obj;
                 }
             }
+        }
 
-            m_InfectedTargets[i] = bestTarget;
+        m_InfectedTargets[i] = bestTarget;
     }
 
-	void RushCivilian(GameObject ActiveInfected, GameObject Target, int HumanIndex)
+    void RushCivilian(GameObject ActiveInfected, GameObject Target, int HumanIndex)
     {
-		if (Target == null)
-			return;
-		
+        if (Target == null)
+            return;
+
         Vector3 targetPosition = Target.transform.position;
 
-		if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= m_DifficultyParameters[m_DifficultyCurrentLevel].m_ZombieConversionRange)
+        if (Vector3.Distance(ActiveInfected.transform.position, Target.transform.position) <= m_DifficultyParameters.m_ZombieConversionRange)
         {
-			if (Target.tag != "Infected") {
+            if (Target.tag != "Infected")
+            {
                 ActiveInfected.tag = "Eating";
                 Target.tag = "Infected";
                 m_CountOfInfected += 1;
                 m_CountOfCivilians -= 1;
 
-				//Register zombie for panic
-				int gridX = GetGridXCoordinateFromWorldPosition (Target.transform.position.x);
-				int gridY = GetGridYCoordinateFromWorldPosition (Target.transform.position.y);
+                //Register zombie for panic
+                int gridX = GetGridXCoordinateFromWorldPosition(Target.transform.position.x);
+                int gridY = GetGridYCoordinateFromWorldPosition(Target.transform.position.y);
 
-				SetGridsWithZombies (gridX, gridY);
+                SetGridsWithZombies(gridX, gridY);
 
-				//g_MapReader.AddBloodSplat (Target.transform.position, 6, 20);
-				g_MapReader.AddBloodSplat (Target.transform.position, 3, 10);
+                g_MapReader.AddBloodSplat(Target.transform.position, 3, 10);
 
-                m_HumanSpeeds [HumanIndex] = UnityEngine.Random.Range (m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed - m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus, m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed + m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedSpeedPlusMinus); 
+                m_HumanSpeeds[HumanIndex] = UnityEngine.Random.Range(m_DifficultyParameters.InfectedBaseSpeed - m_DifficultyParameters.InfectedSpeedPlusMinus, m_DifficultyParameters.InfectedBaseSpeed + m_DifficultyParameters.InfectedSpeedPlusMinus);
 
-				if (m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost > 1.0f) {
-					m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost -= m_DifficultyParameters[m_DifficultyCurrentLevel].m_ZombieBoostDegradeAmountPerNewZombie;
-					if (m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost < 1.0f) 
-					{
-						m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost = 1.0f;
-					}
-				} 
+                if (m_DifficultyParameters.m_CurrentZombieBoost > 1.0f)
+                {
+                    m_DifficultyParameters.m_CurrentZombieBoost -= m_DifficultyParameters.m_ZombieBoostDegradeAmountPerNewZombie;
+                    if (m_DifficultyParameters.m_CurrentZombieBoost < 1.0f)
+                    {
+                        m_DifficultyParameters.m_CurrentZombieBoost = 1.0f;
+                    }
+                }
 
-			}
+            }
         }
         else
         {
-			Vector3 newDirection = Vector3.Normalize(targetPosition - ActiveInfected.transform.position);
-			Vector3 newDestination = ActiveInfected.transform.position + (newDirection * m_DifficultyParameters[m_DifficultyCurrentLevel].InfectedBaseSpeed * Time.deltaTime);
+            Vector3 newDirection = Vector3.Normalize(targetPosition - ActiveInfected.transform.position);
+            Vector3 newDestination = ActiveInfected.transform.position + (newDirection * m_DifficultyParameters.InfectedBaseSpeed * Time.deltaTime);
 
-			if (CanMove (newDestination)) 
-			{
-				ActiveInfected.transform.position = newDestination;
-			} 
-			else 
-			{
-				Vector3 newDestinationX = ActiveInfected.transform.position + (new Vector3(newDirection.x, 0.0f, 0.0f) * m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost * Time.deltaTime);
-				Vector3 newDestinationY = ActiveInfected.transform.position + (new Vector3(0.0f, newDirection.y, 0.0f) * m_DifficultyParameters[m_DifficultyCurrentLevel].m_CurrentZombieBoost * Time.deltaTime);
+            if (CanMove(newDestination))
+            {
+                ActiveInfected.transform.position = newDestination;
+            }
+            else
+            {
+                Vector3 newDestinationX = ActiveInfected.transform.position + (new Vector3(newDirection.x, 0.0f, 0.0f) * m_DifficultyParameters.m_CurrentZombieBoost * Time.deltaTime);
+                Vector3 newDestinationY = ActiveInfected.transform.position + (new Vector3(0.0f, newDirection.y, 0.0f) * m_DifficultyParameters.m_CurrentZombieBoost * Time.deltaTime);
 
-				if (newDirection.x > newDirection.y) 
-				{
-					if (CanMove (newDestinationX)) 
-					{
-						ActiveInfected.transform.position = newDestinationX;
-					} 
-					else if (CanMove (newDestinationY)) 
-					{
-						ActiveInfected.transform.position = newDestinationY;
-					}
-				} 
-				else 
-				{
-					if (CanMove (newDestinationY)) 
-					{
-						ActiveInfected.transform.position = newDestinationY;
-					} 
-					else if (CanMove (newDestinationX)) 
-					{
-						ActiveInfected.transform.position = newDestinationX;
-					}
-				}
-			}	
+                if (newDirection.x > newDirection.y)
+                {
+                    if (CanMove(newDestinationX))
+                    {
+                        ActiveInfected.transform.position = newDestinationX;
+                    }
+                    else if (CanMove(newDestinationY))
+                    {
+                        ActiveInfected.transform.position = newDestinationY;
+                    }
+                }
+                else
+                {
+                    if (CanMove(newDestinationY))
+                    {
+                        ActiveInfected.transform.position = newDestinationY;
+                    }
+                    else if (CanMove(newDestinationX))
+                    {
+                        ActiveInfected.transform.position = newDestinationX;
+                    }
+                }
+            }
         }
     }
 
-	void MoveHumanRandomly(GameObject ActiveHuman, int humanIndex, float maxRandomGradualHeadingChange)
-	{
-		float terrorModifier = 1.0f;
-		if (ActiveHuman.tag != "Infected" && m_GridsWithZombies [m_CivilianGridIndex[humanIndex]]) 
-		{
-			terrorModifier = 0.02f * (float)m_CountOfInfected;
+    void MoveHumanRandomly(GameObject ActiveHuman, int humanIndex, float maxRandomGradualHeadingChange)
+    {
+        float terrorModifier = 1.0f;
+        if (ActiveHuman.tag != "Infected" && m_GridsWithZombies[m_CivilianGridIndex[humanIndex]])
+        {
+            terrorModifier = 0.02f * (float)m_CountOfInfected;
 
-			if (terrorModifier > 4.0f) 
-			{
-				terrorModifier = 4.0f;
-			}
-		}
+            if (terrorModifier > 4.0f)
+            {
+                terrorModifier = 4.0f;
+            }
+        }
 
-		Vector3 newDestination;
-		if (ActiveHuman.tag == "Infected") 
-		{
-			newDestination = ActiveHuman.transform.position + (m_HumanSpeeds [humanIndex] * m_HumanHeadings [humanIndex] * m_HumanHealthIndex [humanIndex] * m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingZombieBoost * Time.deltaTime);
-		} 
-		else 
-		{
-			newDestination = ActiveHuman.transform.position + (m_HumanSpeeds[humanIndex] * m_HumanHeadings[humanIndex] * m_HumanHealthIndex [humanIndex]* terrorModifier * Time.deltaTime);
-		}
+        Vector3 newDestination;
+        if (ActiveHuman.tag == "Infected")
+        {
+            newDestination = ActiveHuman.transform.position + (m_HumanSpeeds[humanIndex] * m_HumanHeadings[humanIndex] * m_HumanHealthIndex[humanIndex] * m_DifficultyParameters.m_StartingZombieBoost * Time.deltaTime);
+        }
+        else
+        {
+            newDestination = ActiveHuman.transform.position + (m_HumanSpeeds[humanIndex] * m_HumanHeadings[humanIndex] * m_HumanHealthIndex[humanIndex] * terrorModifier * Time.deltaTime);
+        }
 
-		if (CanMove (newDestination)) {
-			ActiveHuman.transform.position = newDestination;
-			Vector3 newGradualRandomHeadingchange = new Vector3 (UnityEngine.Random.Range (-maxRandomGradualHeadingChange, maxRandomGradualHeadingChange), UnityEngine.Random.Range (-maxRandomGradualHeadingChange, maxRandomGradualHeadingChange), 0.0f);
-			m_HumanHeadings [humanIndex] = Vector3.Normalize (m_HumanHeadings [humanIndex] + newGradualRandomHeadingchange);
-		} 
-		else {
-			m_HumanHeadings[humanIndex].x = UnityEngine.Random.Range(-1.0f, 1.0f);
-			m_HumanHeadings[humanIndex].y = UnityEngine.Random.Range(-1.0f, 1.0f);
-			m_HumanHeadings[humanIndex].z = 0.0f;
-			m_HumanHeadings [humanIndex] = Vector3.Normalize (m_HumanHeadings [humanIndex]);
-		}
-	}
+        if (CanMove(newDestination))
+        {
+            ActiveHuman.transform.position = newDestination;
+            Vector3 newGradualRandomHeadingchange = new Vector3(UnityEngine.Random.Range(-maxRandomGradualHeadingChange, maxRandomGradualHeadingChange), UnityEngine.Random.Range(-maxRandomGradualHeadingChange, maxRandomGradualHeadingChange), 0.0f);
+            m_HumanHeadings[humanIndex] = Vector3.Normalize(m_HumanHeadings[humanIndex] + newGradualRandomHeadingchange);
+        }
+        else
+        {
+            m_HumanHeadings[humanIndex].x = UnityEngine.Random.Range(-1.0f, 1.0f);
+            m_HumanHeadings[humanIndex].y = UnityEngine.Random.Range(-1.0f, 1.0f);
+            m_HumanHeadings[humanIndex].z = 0.0f;
+            m_HumanHeadings[humanIndex] = Vector3.Normalize(m_HumanHeadings[humanIndex]);
+        }
+    }
 
     bool IsHungry(GameObject ActiveInfected)
     {
@@ -373,38 +384,38 @@ public class AIManager : MonoBehaviour
         return false;
     }
 
-    
+
 
     void BuildInitialListOfCivilians()
     {
         m_Civilians = GameObject.FindGameObjectsWithTag("Civilian");
         int amountOfCivilians = m_Civilians.Length;
         m_CivilianGridIndex = new int[amountOfCivilians];
-		m_HumanSpeeds = new float[amountOfCivilians];
-		m_HumanHeadings = new Vector3[amountOfCivilians];
-		m_InfectedTargets = new GameObject[amountOfCivilians];
-		m_HumanHealthIndex = new float[amountOfCivilians];
+        m_HumanSpeeds = new float[amountOfCivilians];
+        m_HumanHeadings = new Vector3[amountOfCivilians];
+        m_InfectedTargets = new GameObject[amountOfCivilians];
+        m_HumanHealthIndex = new float[amountOfCivilians];
 
         for (int i = 0; i < amountOfCivilians; ++i)
         {
             m_CivilianGridIndex[i] = 0;
-			m_HumanSpeeds[i] = UnityEngine.Random.Range(m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianBaseSpeed - m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianSpeedPlusMinus, m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianBaseSpeed + m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianSpeedPlusMinus);
-			m_HumanHeadings[i].x = UnityEngine.Random.Range(-1.0f, 1.0f);
-			m_HumanHeadings[i].y = UnityEngine.Random.Range(-1.0f, 1.0f);
-			m_HumanHeadings[i].z = 0.0f;
-			m_HumanHeadings [i] = Vector3.Normalize (m_HumanHeadings [i]);
-			m_InfectedTargets[i] = null;
-			m_HumanHealthIndex [i] = 1.0f;
+            m_HumanSpeeds[i] = UnityEngine.Random.Range(m_DifficultyParameters.CivilianBaseSpeed - m_DifficultyParameters.CivilianSpeedPlusMinus, m_DifficultyParameters.CivilianBaseSpeed + m_DifficultyParameters.CivilianSpeedPlusMinus);
+            m_HumanHeadings[i].x = UnityEngine.Random.Range(-1.0f, 1.0f);
+            m_HumanHeadings[i].y = UnityEngine.Random.Range(-1.0f, 1.0f);
+            m_HumanHeadings[i].z = 0.0f;
+            m_HumanHeadings[i] = Vector3.Normalize(m_HumanHeadings[i]);
+            m_InfectedTargets[i] = null;
+            m_HumanHealthIndex[i] = 1.0f;
         }
     }
 
     void SetupGameObjectGridList()
     {
-		m_GridsWithZombies = new bool[m_GridWidth * m_GridHeight];
+        m_GridsWithZombies = new bool[m_GridWidth * m_GridHeight];
         for (int i = 0; i < m_GridWidth * m_GridHeight; ++i)
         {
             GameObjectGridList.Add(new List<GameObject>());
-			m_GridsWithZombies [i] = false;
+            m_GridsWithZombies[i] = false;
         }
     }
 
@@ -424,7 +435,7 @@ public class AIManager : MonoBehaviour
 
     void UpdateCivilianGameObjectLists()
     {
-        
+
         int amountOfCivilians = m_Civilians.Length;
         for (int i = 0; i < amountOfCivilians; ++i)
         {
@@ -446,27 +457,31 @@ public class AIManager : MonoBehaviour
                 m_CivilianGridIndex[i] = newCivilianGridIndex;
             }
 
-			
+
         }
     }
 
-	void SetGridsWithZombies(int gridX, int gridY)
-	{
-		m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY)] = true;
+    void SetGridsWithZombies(int gridX, int gridY)
+    {
+        m_GridsWithZombies[GetIndexFromGridCoordinates(gridX, gridY)] = true;
 
-		if (gridX < m_GridWidth - 1) {
-			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX + 1,gridY)] = true;
-		}
-		if (gridX > 0) {
-			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX - 1,gridY)] = true;
-		}
-		if (gridY < m_GridHeight - 1) {
-			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY + 1)] = true;
-		}
-		if (gridY > 0) {
-			m_GridsWithZombies [GetIndexFromGridCoordinates(gridX,gridY - 1)] = true;
-		}
-	}
+        if (gridX < m_GridWidth - 1)
+        {
+            m_GridsWithZombies[GetIndexFromGridCoordinates(gridX + 1, gridY)] = true;
+        }
+        if (gridX > 0)
+        {
+            m_GridsWithZombies[GetIndexFromGridCoordinates(gridX - 1, gridY)] = true;
+        }
+        if (gridY < m_GridHeight - 1)
+        {
+            m_GridsWithZombies[GetIndexFromGridCoordinates(gridX, gridY + 1)] = true;
+        }
+        if (gridY > 0)
+        {
+            m_GridsWithZombies[GetIndexFromGridCoordinates(gridX, gridY - 1)] = true;
+        }
+    }
 
     int GetIndexFromGridCoordinates(int x, int y)
     {
@@ -491,19 +506,19 @@ public class AIManager : MonoBehaviour
         return new Vector3(x * m_GridCellWidthHeight, y * m_GridCellWidthHeight, 0.0f) + m_GridOffset + new Vector3(m_GridCellWidthHeight * 0.5f, m_GridCellWidthHeight * 0.5f);
     }
 
-	bool CanMove(Vector3 destination)
-	{
-		if (!m_HasMapReader)
-			return false;
-		
-		return g_MapReader.CanMoveThere(destination[0], destination[1]);
-	}
+    bool CanMove(Vector3 destination)
+    {
+        if (!m_HasMapReader)
+            return false;
+
+        return g_MapReader.CanMoveThere(destination[0], destination[1]);
+    }
 
 
     void InitialInfection()
     {
         m_TimeBeforeSpawn -= Time.deltaTime;
-        if (m_TimeBeforeSpawn <= 0 )
+        if (m_TimeBeforeSpawn <= 0)
         {
             int index = m_Civilians.Length;
             int randomCivilian = UnityEngine.Random.Range(0, index);
@@ -511,44 +526,51 @@ public class AIManager : MonoBehaviour
             musicM.SoundManager(m_Civilians[randomCivilian]);
 
             m_InitialActiveZombies += 1;
-			m_CountOfInfected += 1;
-			m_CountOfCivilians -= 1;
+            m_CountOfInfected += 1;
+            m_CountOfCivilians -= 1;
             m_TimeBeforeSpawn += UnityEngine.Random.Range(2, 5);
 
-            if (m_InitialActiveZombies == m_DifficultyParameters[m_DifficultyCurrentLevel].m_NumberOfZombies) { m_InitialInfectionDone = true; }
+            if (m_InitialActiveZombies == m_DifficultyParameters.m_NumberOfZombies) { m_InitialInfectionDone = true; }
         }
     }
 
-	//Listener functions a defined for every GameState
-	protected void OnMenu() {
-		SetState (StaticData.AvailableGameStates.Menu);
-	}
+    //Listener functions a defined for every GameState
+    protected void OnMenu()
+    {
+        SetState(StaticData.AvailableGameStates.Menu);
+    }
 
-	protected void OnStarting() {
-		SetState (StaticData.AvailableGameStates.Starting);
+    protected void OnStarting()
+    {
+        SetState(StaticData.AvailableGameStates.Starting);
 
-	}
+    }
 
-	protected void OnPlaying() {
-		SetState (StaticData.AvailableGameStates.Playing);
+    protected void OnPlaying()
+    {
+        SetState(StaticData.AvailableGameStates.Playing);
 
-	}
+    }
 
-	protected void OnPausing() {
-		SetState (StaticData.AvailableGameStates.Paused);
-	}
+    protected void OnPausing()
+    {
+        SetState(StaticData.AvailableGameStates.Paused);
+    }
 
-	protected void OnEnding() {
-		SetState (StaticData.AvailableGameStates.Ending);
-	}
+    protected void OnEnding()
+    {
+        SetState(StaticData.AvailableGameStates.Ending);
+    }
 
-	private void SetState(StaticData.AvailableGameStates state) {
-		gameState = state;
-	}
+    private void SetState(StaticData.AvailableGameStates state)
+    {
+        gameState = state;
+    }
 
-	//Use this function to request a game state change from the GameStateManager
-	private void RequestGameStateChange(StaticData.AvailableGameStates state) {
-		gameStatesManager.ChangeGameState (state);
-	}
-    
+    //Use this function to request a game state change from the GameStateManager
+    private void RequestGameStateChange(StaticData.AvailableGameStates state)
+    {
+        gameStatesManager.ChangeGameState(state);
+    }
+
 }

@@ -39,7 +39,7 @@ public class EndGame : MonoBehaviour {
             else if(aiManager.m_CountOfInfected == m_PreviousNumberOfInfected)
             {
                 m_NumberForcedEnd += 1;
-                if (m_NumberForcedEnd == 500) { m_forcedEnd = true; }  
+                if (m_NumberForcedEnd == 5000) { m_forcedEnd = true; }  
             }
             else
             {
