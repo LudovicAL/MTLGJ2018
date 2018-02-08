@@ -32,12 +32,28 @@ public class TouchControls : MonoBehaviour {
 	void Update () {
 		if (gameState == StaticData.AvailableGameStates.Playing) {
 			if (Input.touchCount > 0) {	//USER HAS FINGER(S) ON
+				/*
 				if (!cameraController.isInCameraMode) {
 					TouchWallConstructionController ();
 				} else {
 					if (!EventSystem.current.IsPointerOverGameObject()) {
 						TouchScreenMoveController ();
 					}
+				}
+				*/
+				if (Camera.main.orthographicSize <= 1.2f && Input.touchCount == 1) {
+					TouchWallConstructionController();
+				} else if (Input.touchCount == 2) {
+					cameraController.TouchCameraZoom();
+					if (Camera.main.orthographicSize <= 1.2f) {
+						cameraController.UpdateActionStatus(false);
+					} else {
+						cameraController.UpdateActionStatus(true);
+					}
+				}
+				else //if (!EventSystem.current.IsPointerOverGameObject())
+				{
+					TouchScreenMoveController();
 				}
 			}
 			if (wallConstructor.getCoordList().Count > 100) {

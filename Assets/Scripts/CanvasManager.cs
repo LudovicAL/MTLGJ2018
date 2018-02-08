@@ -21,13 +21,12 @@ public class CanvasManager : MonoBehaviour
     private Text textRatio;
     public List<GameObject> workerButtons;
     private float m_SuccessRatioNeeded = 0.3f;
+	private CameraController cameraController;
 
-    void Awake()
-    {
+    void Awake() {
         panelWorker = GameObject.Find("Panel Worker");
         workerButtons = new List<GameObject>();
-        for (int i = 0; i < numberOfWorkers; i++)
-        {
+        for (int i = 0; i < numberOfWorkers; i++) {
             int index = i;
             GameObject newButton = Instantiate(workerButtonPrefab, panelWorker.transform);
             newButton.GetComponent<Button>().onClick.AddListener(delegate { WorkerButtonPress(index); });
@@ -36,8 +35,8 @@ public class CanvasManager : MonoBehaviour
     }
 
     // Use this for initialization
-    void Start()
-    {
+    void Start() {
+		cameraController = GameObject.Find("Scriptsbucket").GetComponent<CameraController>();
         eg = GameObject.Find("Scriptsbucket").GetComponent<EndGame>();
         GameObject.Find("Button Start").GetComponent<Button>().onClick.AddListener(StartButtonPress);
         GameObject.Find("Button Quit").GetComponent<Button>().onClick.AddListener(QuitButtonPress);
@@ -95,17 +94,12 @@ public class CanvasManager : MonoBehaviour
         }
     }
 
-    public void WorkerButtonPress(int buttonNo)
-    {
-        ControlsManager controlsManager = scriptsBucketObject != null ? scriptsBucketObject.GetComponent<ControlsManager>() : null;
-        if (controlsManager != null)
-        {
-            controlsManager.ToggleCameraMode();
-            bool newIsInCameraMode = controlsManager.GetIsInCameraMode();
+    public void WorkerButtonPress(int buttonNo) {
+		cameraController.ToggleCameraMode();
+		bool newIsInCameraMode = cameraController.GetIsInCameraMode();
 
-            // TODO: if we ever have more than one button, change only the one that gets changed
-            UpdateWorkerButtons(newIsInCameraMode);
-        }
+        // TODO: if we ever have more than one button, change only the one that gets changed
+        UpdateWorkerButtons(newIsInCameraMode);
     }
 
     public void UpdateWorkerButtons(bool _isInCameraMode)
