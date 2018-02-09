@@ -88,6 +88,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ShowResolutionOverlay: 1
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -154,12 +155,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 120fe77a5e87e5c41be1f6162225e231, type: 2}
   m_IsPrefabParent: 0
---- !u!114 &794876153 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114129815793411750, guid: bfdee95942888fa4489b09db9b746c26,
-    type: 2}
-  m_PrefabInternal: {fileID: 1661764804}
-  m_Script: {fileID: 11500000, guid: 288465fd2bbed0546a88dbb45787aaa7, type: 3}
 --- !u!1001 &866266343
 Prefab:
   m_ObjectHideFlags: 0
@@ -295,8 +290,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1114069167}
-  - component: {fileID: 1114069166}
-  - component: {fileID: 1114069168}
   - component: {fileID: 1114069169}
   - component: {fileID: 1114069170}
   - component: {fileID: 1114069171}
@@ -309,67 +302,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1114069166
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1114069165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 854eb949be4166548abb9498fc89a1a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_DifficultyParameters:
-  - {fileID: 794876153}
-  - {fileID: 2047670470}
-  - {fileID: 1342854197}
-  m_DifficultyCurrentLevel: 0
-  gameStatesManager: {fileID: 0}
-  gameState: 0
-  musicM: {fileID: 0}
-  GridList: []
-  CurrentColor:
-    r: 0
-    g: 0
-    b: 0
-    a: 0
-  NewColor:
-    r: 0
-    g: 0
-    b: 0
-    a: 0
-  Red: 0
-  Blue: 0
-  Green: 0
-  Civilian: {fileID: 4152111572699614, guid: 3555833690c88814398fba0f4dcb1116, type: 2}
-  g_MapReader: {fileID: 0}
-  m_HasMapReader: 0
-  CountOfInfected: 0
-  DeadInfected: 0
-  CountOfCivilians: 0
-  Afraid: {fileID: 8300000, guid: 048035e85f78fc545986f210f9fda240, type: 3}
-  Moans: {fileID: 8300000, guid: 28bb4ec7917e6724a9752abd41bbd105, type: 3}
-  Source: {fileID: 0}
-  m_MaxNumberOfInfectedToUpdateEachFrame: 100
-  m_InfectedIndex: 0
-  m_InfectedUpdatedThisFrame: 0
-  m_TimeBeforeSpawn: 0
-  m_InitialActiveZombies: 0
-  m_InitialInfectionDone: 0
-  m_InfectedCountText: {fileID: 0}
-  m_RegTarget: 0.5
-  m_GridWidth: 18
-  m_GridHeight: 14
-  m_GridCellWidthHeight: 0.5
-  m_GridOffset: {x: 0, y: 0, z: 0}
-  m_Civilians: []
-  m_CivilianGridIndex: 
-  m_HumanSpeeds: []
-  m_HumanHealthIndex: []
-  m_HumanHeadings: []
-  m_InfectedTargets: []
-  m_GridsWithZombies: []
 --- !u!4 &1114069167
 Transform:
   m_ObjectHideFlags: 0
@@ -383,18 +315,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1114069168
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1114069165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45e9ab635cb1786498eb7d0bb2328bd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraSpeed: 10
 --- !u!114 &1114069169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,22 +399,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5c433c60b3703d48997e2fae269f6de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_DifficultyParameters:
-  - {fileID: 794876153}
-  - {fileID: 2047670470}
-  - {fileID: 1342854197}
   Civilian: {fileID: 4152111572699614, guid: 3555833690c88814398fba0f4dcb1116, type: 2}
-  m_DifficultyCurrentLevel: 0
-  CountOfInfected: 0
-  CountOfDead: 0
-  CountOfCivilians: 0
+  m_CountOfInfected: 0
+  m_CountOfDead: 0
+  m_CountOfCivilians: 0
   m_InitialInfectionDone: 0
---- !u!114 &1342854197 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114827122575977632, guid: bfdee95942888fa4489b09db9b746c26,
-    type: 2}
-  m_PrefabInternal: {fileID: 1661764804}
-  m_Script: {fileID: 11500000, guid: 288465fd2bbed0546a88dbb45787aaa7, type: 3}
+  m_StartingHumans: 0
 --- !u!1 &1484495571
 GameObject:
   m_ObjectHideFlags: 0
@@ -792,6 +702,16 @@ Prefab:
       propertyPath: m_LocalPosition.y
       value: -52.199997
       objectReference: {fileID: 0}
+    - target: {fileID: 224095143598111658, guid: 853c9d5a5d7494145bc765fbb71f8c30,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224567207565043240, guid: 853c9d5a5d7494145bc765fbb71f8c30,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 853c9d5a5d7494145bc765fbb71f8c30, type: 2}
   m_IsPrefabParent: 0
@@ -859,6 +779,7 @@ Camera:
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
@@ -956,12 +877,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
---- !u!114 &2047670470 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114940104424494764, guid: bfdee95942888fa4489b09db9b746c26,
-    type: 2}
-  m_PrefabInternal: {fileID: 1661764804}
-  m_Script: {fileID: 11500000, guid: 288465fd2bbed0546a88dbb45787aaa7, type: 3}
 --- !u!1001 &2137317640
 Prefab:
   m_ObjectHideFlags: 0
