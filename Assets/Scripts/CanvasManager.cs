@@ -13,7 +13,6 @@ public class CanvasManager : MonoBehaviour
     public Sprite spriteFreeWorker;
     private EndGame eg;
     public GameObject panelWorker;
-    private GameObject scriptsBucketObject;
     private GameStatesManager gameStatesManager;    //Refers to the GameStateManager
     private StaticData.AvailableGameStates gameState;   //Mimics the GameStateManager's gameState variable at all time
     private Text textCasualties;
@@ -22,6 +21,7 @@ public class CanvasManager : MonoBehaviour
     public List<GameObject> workerButtons;
     private float m_SuccessRatioNeeded = 0.3f;
 	private CameraController cameraController;
+	private CiviliansSpawner civiliansSpawner;
 
     void Awake() {
         panelWorker = GameObject.Find("Panel Worker");
@@ -36,6 +36,7 @@ public class CanvasManager : MonoBehaviour
 
     // Use this for initialization
     void Start() {
+		civiliansSpawner = GameObject.Find ("Scriptsbucket").GetComponent<CiviliansSpawner>();
 		cameraController = GameObject.Find("Scriptsbucket").GetComponent<CameraController>();
         eg = GameObject.Find("Scriptsbucket").GetComponent<EndGame>();
         GameObject.Find("Button Start").GetComponent<Button>().onClick.AddListener(StartButtonPress);
@@ -63,8 +64,6 @@ public class CanvasManager : MonoBehaviour
         {
             showPanel("Panel Menu");
         }
-
-        scriptsBucketObject = GameObject.Find("Scriptsbucket");
         UpdateWorkerButtons(true);
     }
 
@@ -121,8 +120,8 @@ public class CanvasManager : MonoBehaviour
         }
     }
 
-    public void StartButtonPress()
-    {
+    public void StartButtonPress() {
+		civiliansSpawner.SpawnCivilians ();
         RequestGameStateChange(StaticData.AvailableGameStates.Playing);
     }
 

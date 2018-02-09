@@ -37,7 +37,6 @@ public class CiviliansSpawner : MonoBehaviour {
 	private void PlaceNewCivilians(int numberOfCiviliansToSpawn) {
 		float yAxis = Civilian.position.y;
 		float xAxis = Civilian.position.x;
-
 		for (int i = 0; i < numberOfCiviliansToSpawn; i++) {
 			float[] randomSpawnPos = g_MapReader.FindRandomWhiteSpace();
 			xAxis = randomSpawnPos[0];

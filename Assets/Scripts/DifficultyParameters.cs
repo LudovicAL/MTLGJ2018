@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class DifficultyParameters : MonoBehaviour
 {
 
-    public bool m_IsInitialized = false;
+	[HideInInspector] public bool m_IsInitialized = false;
     public int m_StartingHumans = 250;
     public float InfectedBaseSpeed = .5f;
     public float InfectedSpeedPlusMinus = .2f;
@@ -30,29 +30,25 @@ public class DifficultyParameters : MonoBehaviour
 
     private Slider SliderDiff;
 
-    void Awake()
-    {
-        SliderDiff = GameObject.Find("Slider Difficulty").GetComponent<Slider>();
-        SliderDiff.onValueChanged.AddListener(delegate { OnValueChanged(); });
+    void Awake() {
+
     }
 
     // Use this for initialization
-    void Start()
-    {
-
-        m_DifficultyCurrentLevel = PlayerPrefs.GetInt("CurrentDifficulty", 0);
+    void Start() {
+		SliderDiff = GameObject.Find("Slider Difficulty").GetComponent<Slider>();
+		SliderDiff.onValueChanged.AddListener(delegate { OnValueChanged(); });
+        m_DifficultyCurrentLevel = PlayerPrefs.GetInt("CurrentDifficulty", 1);
         AdjustParameters();
 
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
 
     }
 
-    public void OnValueChanged()
-    {
+    public void OnValueChanged() {
         m_DifficultyCurrentLevel = (int)SliderDiff.value;
         PlayerPrefs.SetInt("Difficulty", m_DifficultyCurrentLevel);
         PlayerPrefs.SetInt("CurrentDifficulty", m_DifficultyCurrentLevel);
@@ -60,10 +56,9 @@ public class DifficultyParameters : MonoBehaviour
 
     }
 
-    void AdjustParameters()
-    {
+    void AdjustParameters() {
         m_StartingHumans = Mathf.Min(250 * (int)(Mathf.Pow(m_DifficultyCurrentLevel, 2)) + (250 * PlayerPrefs.GetInt("CurrentLevel", 0)), 3000); ;
-        m_NumberOfZombies = Mathf.Min(1 * m_DifficultyCurrentLevel + (int)Mathf.Round(.3f * PlayerPrefs.GetInt("CurrentLevel", 0)), 10);
+		m_NumberOfZombies = Mathf.Min(1 * m_DifficultyCurrentLevel + (int)Mathf.Round(.3f * PlayerPrefs.GetInt("CurrentLevel", 0)), 10);
         m_StartingZombieBoost = .5f * m_DifficultyCurrentLevel;
     }
 }
