@@ -12,7 +12,6 @@ public class CiviliansSpawner : MonoBehaviour {
 	[HideInInspector] public float[] humanHealthIndex;
 	[HideInInspector] public Vector3[] humanHeadings;
 	private MapReader g_MapReader;
-	private int m_DifficultyCurrentLevel = 0;
 	private DifficultyParameters difficultyParameter;
 
 	void Start() {

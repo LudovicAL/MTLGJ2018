@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 public class CanvasManager : MonoBehaviour
 {
@@ -25,7 +24,16 @@ public class CanvasManager : MonoBehaviour
 	private DifficultyParameters difficultyParameters;
 
     void Awake() {
+		gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
         panelWorker = GameObject.Find("Panel Worker");
+		difficultyParameters = GameObject.Find("Scriptsbucket").GetComponent<DifficultyParameters>();
+		civiliansSpawner = GameObject.Find ("Scriptsbucket").GetComponent<CiviliansSpawner>();
+		cameraController = GameObject.Find("Scriptsbucket").GetComponent<CameraController>();
+		eg = GameObject.Find("Scriptsbucket").GetComponent<EndGame>();
+		textCasualties = GameObject.Find("Text Casualties").GetComponent<Text>();
+		textSurvivors = GameObject.Find("Text Survivors").GetComponent<Text>();
+		textRatio = GameObject.Find("Text Ratio").GetComponent<Text>();
+		SliderDiff = GameObject.Find("Slider Difficulty").GetComponent<Slider>();
         workerButtons = new List<GameObject>();
         for (int i = 0; i < numberOfWorkers; i++) {
             int index = i;
@@ -37,55 +45,47 @@ public class CanvasManager : MonoBehaviour
 
     // Use this for initialization
     void Start() {
-		difficultyParameters = GameObject.Find("Scriptsbucket").GetComponent<DifficultyParameters>();
-		civiliansSpawner = GameObject.Find ("Scriptsbucket").GetComponent<CiviliansSpawner>();
-		cameraController = GameObject.Find("Scriptsbucket").GetComponent<CameraController>();
-        eg = GameObject.Find("Scriptsbucket").GetComponent<EndGame>();
         GameObject.Find("Button Start").GetComponent<Button>().onClick.AddListener(StartButtonPress);
         GameObject.Find("Button Quit").GetComponent<Button>().onClick.AddListener(QuitButtonPress);
         GameObject.Find("Button Abandon").GetComponent<Button>().onClick.AddListener(QuitButtonPress);
         GameObject.Find("Button Continue").GetComponent<Button>().onClick.AddListener(ContinueButtonPress);
-        //GameObject.Find ("Button Menu").GetComponent<Button> ().onClick.AddListener (MenuButtonPress);
-        textCasualties = GameObject.Find("Text Casualties").GetComponent<Text>();
-        textSurvivors = GameObject.Find("Text Survivors").GetComponent<Text>();
-        textRatio = GameObject.Find("Text Ratio").GetComponent<Text>();
-
-        gameStatesManager = GameObject.Find("Scriptsbucket").GetComponent<GameStatesManager>();
+		SliderDiff.onValueChanged.AddListener(delegate { OnSliderValueChanged(); });
         gameStatesManager.MenuGameState.AddListener(OnMenu);
         gameStatesManager.StartingGameState.AddListener(OnStarting);
         gameStatesManager.PlayingGameState.AddListener(OnPlaying);
         gameStatesManager.PausedGameState.AddListener(OnPausing);
         gameStatesManager.EndingGameState.AddListener(OnEnding);
         SetState(gameStatesManager.gameState);
-
-        if (gameState == StaticData.AvailableGameStates.Playing)
-        {
-            showPanel("Panel Game");
-        }
-        else
-        {
-            showPanel("Panel Menu");
-        }
+        showPanel();
         UpdateWorkerButtons(true);
-
-		SliderDiff = GameObject.Find("Slider Difficulty").GetComponent<Slider>();
-		SliderDiff.onValueChanged.AddListener(delegate { OnValueChanged(); });
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-	public void OnValueChanged() {
+	public void OnSliderValueChanged() {
 		difficultyParameters.AdjustParameters ((int)SliderDiff.value);
 	}
 
-    public void MenuButtonPress()
-    {
-        SceneManager.LoadScene(0);
-    }
+	private void showPanel() {
+		switch (gameState) {
+			case StaticData.AvailableGameStates.Ending:
+				showPanel ("Panel End");
+				break;
+			case StaticData.AvailableGameStates.Menu:
+				showPanel ("Panel Menu");
+				break;
+			case StaticData.AvailableGameStates.Paused:
+				showPanel ("Panel Menu");
+				break;
+			case StaticData.AvailableGameStates.Playing:
+				showPanel ("Panel Game");
+				break;
+			case StaticData.AvailableGameStates.Starting:
+				showPanel ("Panel Game");
+				break;
+			default:
+				showPanel ("Panel Menu");
+				break;
+		}
+	}
 
     private void showPanel(string panelName)
     {
@@ -139,61 +139,45 @@ public class CanvasManager : MonoBehaviour
         Application.Quit();
     }
 
-    public void ContinueButtonPress()
-    {
-        if (GameObject.Find("WhatsNext").tag != "Respawn")
-        {
-            GameObject.Find("Scriptsbucket").GetComponent<UserprefsManager>().IncrementDifficulty();
+    public void ContinueButtonPress() {
+        if (GameObject.Find("WhatsNext").tag != "Respawn") {
+			//TODO: MAKE IT SO THE LEVEL RELOAD ITSELF WITHOUT RELOADING THE SCENE (WHICH IS TROUBLESOME)
         }
-        RequestGameStateChange(StaticData.AvailableGameStates.Playing);
-        SceneManager.LoadScene(0);
     }
 
     //Listener functions a defined for every GameState
-    protected void OnMenu()
-    {
+    protected void OnMenu() {
         SetState(StaticData.AvailableGameStates.Menu);
-        showPanel("Panel Menu");
     }
 
-    protected void OnStarting()
-    {
+    protected void OnStarting() {
         SetState(StaticData.AvailableGameStates.Starting);
-
     }
 
-    protected void OnPlaying()
-    {
+    protected void OnPlaying() {
         SetState(StaticData.AvailableGameStates.Playing);
-        showPanel("Panel Game");
     }
 
-    protected void OnPausing()
-    {
+    protected void OnPausing() {
         SetState(StaticData.AvailableGameStates.Paused);
     }
 
-    protected void OnEnding()
-    {
+    protected void OnEnding() {
         SetState(StaticData.AvailableGameStates.Ending);
         ShowEndScreen();
     }
 
-    private void SetState(StaticData.AvailableGameStates state)
-    {
+    private void SetState(StaticData.AvailableGameStates state) {
         gameState = state;
+		showPanel();
     }
 
     //Use this function to request a game state change from the GameStateManager
-    private void RequestGameStateChange(StaticData.AvailableGameStates state)
-    {
+    private void RequestGameStateChange(StaticData.AvailableGameStates state) {
         gameStatesManager.ChangeGameState(state);
     }
 
-    public void ShowEndScreen()
-    {
-
-        showPanel("Panel End");
+    public void ShowEndScreen() {
         Camera camera = Camera.main;
         camera.transform.position = new Vector3(0, 0);
         camera.orthographicSize = 3f;
@@ -203,20 +187,15 @@ public class CanvasManager : MonoBehaviour
         float ratio = (float)eg.m_NumberOfCivilians / ((float)eg.m_NumberOfCasualties + (float)eg.m_NumberOfCivilians);
         textRatio.text = ratio.ToString("0.0%");
 
-        if (ratio >= m_SuccessRatioNeeded)
-        {
+        if (ratio >= m_SuccessRatioNeeded) {
             GameObject.Find("Text Ratio").GetComponent<Text>().color = new Color(0.3529f, .5098f, .047f);
             GameObject.Find("WhatsNext").GetComponent<Text>().text = "Continue";
             GameObject.Find("Text WinLose").GetComponent<Text>().text = "You win";
-        }
-        else
-        {
+        } else {
             GameObject.Find("Text Ratio").GetComponent<Text>().color = new Color(0.196f, 0.0078f, 0.0078f);
             GameObject.Find("WhatsNext").GetComponent<Text>().text = "Restart";
             GameObject.Find("Text WinLose").GetComponent<Text>().text = "You lose";
             GameObject.Find("WhatsNext").tag = "Respawn";
         }
-        GameObject.Find("Text Diff").GetComponent<Text>().text = PlayerPrefs.GetInt("Difficulty").ToString();
-        GameObject.Find("Text Level").GetComponent<Text>().text = PlayerPrefs.GetInt("CurrentLevel").ToString();
     }
 }
