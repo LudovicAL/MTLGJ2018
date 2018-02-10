@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class CiviliansSpawner : MonoBehaviour {
 
-	public List<DifficultyParameters> m_DifficultyParameters;
 	public Transform Civilian;
 	[HideInInspector] public GameObject[] arrayOfCivilians;
 	[HideInInspector] public GameObject[] arrayOfInfectedTargets;
@@ -14,14 +13,17 @@ public class CiviliansSpawner : MonoBehaviour {
 	[HideInInspector] public Vector3[] humanHeadings;
 	private MapReader g_MapReader;
 	private int m_DifficultyCurrentLevel = 0;
+	private DifficultyParameters difficultyParameter;
 
 	void Start() {
+		difficultyParameter = GameObject.Find("Scriptsbucket").GetComponent<DifficultyParameters>();
 		g_MapReader = GameObject.Find("Map").GetComponent<MapReader>();
+
 	}
 
 	public void SpawnCivilians() {
 		RemoveOldCivilians ();
-		PlaceNewCivilians (m_DifficultyParameters[m_DifficultyCurrentLevel].m_StartingHumans);
+		PlaceNewCivilians (difficultyParameter.m_StartingHumans);
 		BuildArrayOfCivilians ();
 	}
 
@@ -56,7 +58,7 @@ public class CiviliansSpawner : MonoBehaviour {
 
 		for (int i = 0; i < amountOfCivilians; ++i) {
 			civilianGridIndex[i] = 0;
-			humanSpeeds[i] = UnityEngine.Random.Range(m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianBaseSpeed - m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianSpeedPlusMinus, m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianBaseSpeed + m_DifficultyParameters[m_DifficultyCurrentLevel].CivilianSpeedPlusMinus);
+			humanSpeeds[i] = UnityEngine.Random.Range(difficultyParameter.CivilianBaseSpeed - difficultyParameter.CivilianSpeedPlusMinus, difficultyParameter.CivilianBaseSpeed + difficultyParameter.CivilianSpeedPlusMinus);
 			humanHeadings[i].x = UnityEngine.Random.Range(-1.0f, 1.0f);
 			humanHeadings[i].y = UnityEngine.Random.Range(-1.0f, 1.0f);
 			humanHeadings[i].z = 0.0f;

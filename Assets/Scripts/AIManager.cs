@@ -6,9 +6,7 @@ using UnityEngine.UI;
 
 public class AIManager : MonoBehaviour
 {
-    //public List<DifficultyParameters> m_DifficultyParameters;
     public Transform Civilian;
-    //public int m_DifficultyCurrentLevel;
     public int m_CountOfInfected;
     public int m_CountOfDead;
     public int m_CountOfCivilians;
@@ -459,7 +457,6 @@ public class AIManager : MonoBehaviour
     bool CanMove(Vector3 destination) {
         return g_MapReader.CanMoveThere(destination[0], destination[1]);
     }
-
 
     void InitialInfection()
     {

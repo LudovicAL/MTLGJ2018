@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class CanvasManager : MonoBehaviour
 {
-
+	private Slider SliderDiff;
     public GameObject workerButtonPrefab;
     public int numberOfWorkers = 0;
     public Sprite spriteBusyWorker;
@@ -22,6 +22,7 @@ public class CanvasManager : MonoBehaviour
     private float m_SuccessRatioNeeded = 0.3f;
 	private CameraController cameraController;
 	private CiviliansSpawner civiliansSpawner;
+	private DifficultyParameters difficultyParameters;
 
     void Awake() {
         panelWorker = GameObject.Find("Panel Worker");
@@ -36,6 +37,7 @@ public class CanvasManager : MonoBehaviour
 
     // Use this for initialization
     void Start() {
+		difficultyParameters = GameObject.Find("Scriptsbucket").GetComponent<DifficultyParameters>();
 		civiliansSpawner = GameObject.Find ("Scriptsbucket").GetComponent<CiviliansSpawner>();
 		cameraController = GameObject.Find("Scriptsbucket").GetComponent<CameraController>();
         eg = GameObject.Find("Scriptsbucket").GetComponent<EndGame>();
@@ -65,6 +67,9 @@ public class CanvasManager : MonoBehaviour
             showPanel("Panel Menu");
         }
         UpdateWorkerButtons(true);
+
+		SliderDiff = GameObject.Find("Slider Difficulty").GetComponent<Slider>();
+		SliderDiff.onValueChanged.AddListener(delegate { OnValueChanged(); });
     }
 
     // Update is called once per frame
@@ -72,6 +77,10 @@ public class CanvasManager : MonoBehaviour
     {
 
     }
+
+	public void OnValueChanged() {
+		difficultyParameters.AdjustParameters ((int)SliderDiff.value);
+	}
 
     public void MenuButtonPress()
     {
