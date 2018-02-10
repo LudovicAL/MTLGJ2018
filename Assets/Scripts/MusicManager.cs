@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class MusicManager : MonoBehaviour {
 
-	private AudioSource audioS;
     public AudioClip Afraid;
     public AudioClip Moans;
-    private bool firstPass;
+	private AudioSource audioS;
+	private bool firstPass;
 
 	// Use this for initialization
 	void Start () {

@@ -7,15 +7,15 @@ public class DifficultyParameters : MonoBehaviour {
 
 	[HideInInspector] public bool m_IsInitialized = false;
 	[HideInInspector] public int m_StartingHumans = 250;
+	[HideInInspector] public int m_NumberOfZombies = 1;
+	[HideInInspector] public float m_StartingZombieBoost = 2.0f;
     public float InfectedBaseSpeed = .5f;
     public float InfectedSpeedPlusMinus = .2f;
     public float CivilianBaseSpeed = .1f;
     public float CivilianSpeedPlusMinus = .05f;
     public float m_ZombieConversionRange = 0.05f;
-	[HideInInspector] public int m_NumberOfZombies = 1;
 
     //Makes the initial spread faster
-	[HideInInspector] public float m_StartingZombieBoost = 2.0f;
     public float m_CurrentZombieBoost = 0.0f;
     public float m_ZombieBoostDegradeAmountPerNewZombie = 0.05f;
 

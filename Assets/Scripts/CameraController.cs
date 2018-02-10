@@ -8,8 +8,8 @@ public class CameraController : MonoBehaviour {
 	public float perspectiveZoomSpeed = 0.005f;	// The rate of change of the field of view in perspective mode.
 	public float orthoZoomSpeed = 0.005f;	// The rate of change of the orthographic size in orthographic mode.
 	public float cameraSpeed = 15.0f;
-	private Vector3 m_PreviousPointerPosition;
 	public bool isInCameraMode { get; private set;} // vs WorkerMode
+	private Vector3 m_PreviousPointerPosition;
 	private Transform cameraTransform;
 	private Transform mapTransform;
 	private Renderer mapRenderer;

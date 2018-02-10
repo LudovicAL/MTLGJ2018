@@ -5,19 +5,19 @@ using UnityEngine.UI;
 
 public class CanvasManager : MonoBehaviour
 {
-	private Slider SliderDiff;
     public GameObject workerButtonPrefab;
     public int numberOfWorkers = 0;
     public Sprite spriteBusyWorker;
     public Sprite spriteFreeWorker;
+	public List<GameObject> workerButtons;
+	public GameObject panelWorker;
     private EndGame eg;
-    public GameObject panelWorker;
     private GameStatesManager gameStatesManager;    //Refers to the GameStateManager
     private StaticData.AvailableGameStates gameState;   //Mimics the GameStateManager's gameState variable at all time
     private Text textCasualties;
     private Text textSurvivors;
     private Text textRatio;
-    public List<GameObject> workerButtons;
+	private Slider SliderDiff;
     private float m_SuccessRatioNeeded = 0.3f;
 	private CameraController cameraController;
 	private CiviliansSpawner civiliansSpawner;
