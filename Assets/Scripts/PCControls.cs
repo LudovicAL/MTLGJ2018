@@ -40,25 +40,14 @@ public class PCControls : MonoBehaviour {
 
 	//Decides what to do with mouse clicks
 	public void MouseClickController() {
-		if (!cameraController.isInCameraMode) {
-			if (Input.GetMouseButton(0)) { //USER IS PRESSING THE MOUSE BUTTON
-				if (Input.GetMouseButtonDown(0)) { //USER PRESSED THE MOUSE BUTTON
-					wallConstructor.WallBegan (Input.mousePosition);
-				} else {	//USER JUST KEPT PRESSING THE MOUSE BUTTON
-					wallConstructor.WallMoved (Input.mousePosition);
-				}
-			} else if (Input.GetMouseButtonUp(0)) {	//USER RELEASED THE MOUSE BUTTON
-				wallConstructor.WallEnded (Input.mousePosition);		
+		if (Input.GetMouseButton(0)) { //USER IS PRESSING THE MOUSE BUTTON
+			if (Input.GetMouseButtonDown(0)) { //USER PRESSED THE MOUSE BUTTON
+				wallConstructor.WallBegan (Input.mousePosition);
+			} else {	//USER JUST KEPT PRESSING THE MOUSE BUTTON
+				wallConstructor.WallMoved (Input.mousePosition);
 			}
-		} else {
-			if (Input.GetMouseButton(0)) {
-				if (!(EventSystem.current.IsPointerOverGameObject())) {
-					if (Input.GetMouseButtonDown(0)) {
-						cameraController.set_m_PreviousPointerPosition(Input.mousePosition);
-					}
-					cameraController.MoveScreenMagically(Input.mousePosition);
-				}
-			}
+		} else if (Input.GetMouseButtonUp(0)) {	//USER RELEASED THE MOUSE BUTTON
+			wallConstructor.WallEnded (Input.mousePosition);		
 		}
 	}
 
