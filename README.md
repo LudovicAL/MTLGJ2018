@@ -3,4 +3,4 @@ A solo game where you must contain a rapidly spreading pandemic in the city, pro
 
 The game can be accessed at https://ludovical.github.io/MTLGameJam2018/ (note that the first loading of this page can take a few minutes).
 
-![Demo gif](https://github.com/LudovicAL/AtomicOrbital/blob/main/Demo.gif?raw=true)
+![Demo gif](https://github.com/LudovicAL/MTLGameJam2018/blob/master/Demo.gif?raw=true)
